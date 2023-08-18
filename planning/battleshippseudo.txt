@@ -1,0 +1,44 @@
+1) Define required constants
+    1.1) Ship types
+        1.2) Destruction condition for each
+
+2) Define required variables used to track the state of the game
+    2.1) Game State
+    2.2) Alliance
+
+3.) Create classes
+    3.1) Game class to handle most the game logic
+    3.2) Board class to reuse for both sides of the play field
+    3.3) Maybe a scoreboard class to reuse for player and computer
+
+4) Store elements on the page that will be accessed in code more than once in variables
+    4.1) Store the two 10x10 boards
+    4.2) Store a dock/box where the player will select his ships from
+    4.3) Store the score boards
+
+4) Upon loading, the app should:
+    4.1) Initialize the state variables
+    4.2) Render those variables
+    4.3) Render both boards
+    4.4) Render the choosing dock/box
+    4.5) Render all messaging
+    4.6) Render the modal
+
+5) Handle player actions
+    5.1) Handle clicking a square
+    5.2) Handle drag and drop from dock/box to the board
+        5.2.1) If the area is empty, the ship should be placed
+            5.2.1.1) Update the values of the array to indicate something is here
+        5.2.2) If the area is taken/partially taken it should return to dock
+        5.2.3) Drag and drop should be disabled when game is in progress
+        5.2.4) Handle mouse wheel scroll to rotate
+
+6) Handle a player selecting the control buttons
+    6.1) Handle the play button
+        6.1.1) This should hide the dock window
+        6.1.2) Ensure that the drag/drop event doesn't work
+    6.2) Handle the reset game button
+        6.2.1) Do steps 4 through 4.5 
+
+
+#NOTES#
