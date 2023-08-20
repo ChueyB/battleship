@@ -1,3 +1,7 @@
+:root {
+    --starwars: 'Star Wars', sans-serif;
+}
+
 * {
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif;
@@ -24,9 +28,16 @@ body {
     height: 100%;
 }
 
+h1 {
+    font-family: var(--starwars);
+    letter-spacing: 0.1rem;
+    color: black;
+    text-shadow: 2px 0 yellow, -2px 0 yellow, 0 2px yellow, 0 -2px yellow,
+        1px 1px yellow, -1px -1px yellow, 1px -1px yellow, -1px 1px yellow;
+}
+
 #modal-content {
     display: flex;
-    color: white;
     flex-direction: column;
     justify-content: space-evenly;
     align-items: center;
@@ -35,38 +46,107 @@ body {
     text-align: center;
     background-color: black;
 }
-img {
+#modal-content > img {
     display: flex;
     height: 20vmin;
     border-radius: 50%;
 }
 
-#message {
-    color: white;
+#game {
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+}
+
+#title {
+    grid-column: 1 / span 3;
+    grid-row: 1 / 2;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+}
+
+#boards {
+    grid-column: 1 / span 3;
+    grid-row: 2 / 4;
+    display: grid;
+}
+
+#computer-board,
+#player-board {
+    background: transparent;
+    grid-template-columns: repeat(10, 5vmin);
+    grid-template-rows: repeat(10, 5vmin);
 }
 
 #computer-board {
-    background: transparent;
+    grid-column: 1 / 1;
+    grid-row: 2 / 4;
     display: none;
-    grid-template-columns: repeat(10, 4vmin);
-    grid-template-rows: repeat(10, 4vmin);
 }
 
+#player-board {
+    /* REMOVE THIS COMMENTED INFO WHEN DONE WITH IT */
+    /* grid-column: 3 / 4;
+    grid-row: 2 /4; */
+    grid-column: 2 / 3;
+    grid-row: 2 /4;
+    display: grid;
+}
+
+#player-board > div,
 #computer-board > div {
     border: 0.1vmin solid darkgrey;
     background-size: contain;
 }
 
-#player-board {
-    background: transparent;
-    display: grid;
-    grid-template-columns: repeat(10, 5vmin);
-    grid-template-rows: repeat(10, 5vmin);
+#scores {
+    grid-column: 2 / 3;
+    grid-row: 2 / 4;
+    display: none;
+    grid-template-columns: repeat(6, 3vmin);
+    grid-template-rows: repeat(3, 1fr);
 }
 
-#player-board > div {
-    border: 0.1vmin solid darkgrey;
-    background-size: contain;
+#computerScore,
+#playerScore {
+    display: grid;
+    text-align: center;
+}
+
+#computerScore {
+    grid-column: 1 / 6;
+    grid-row: 1 / 2;
+    background-color: white;
+}
+
+#playerScore {
+    grid-column: 2 / 7;
+    grid-row: 3 / 4;
+    background-color: red;
+}
+
+#controls {
+    grid-column: 1 / span 3;
+    grid-row: 4 / 5;
+    display: grid;
+    justify-items: center;
+    align-items: center;
+}
+
+#ship-dock {
+    grid-column: 1 / 2;
+    grid-row: 2 / 4;
+    display: grid;
+    justify-items: center;
+    text-align: center;
+}
+
+#instructions-container {
+    grid-column: 3 / 4;
+    grid-row: 2 / 4;
+    display: grid;
 }
 
 .space,
