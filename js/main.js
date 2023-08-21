@@ -60,7 +60,7 @@ const LOOKUP = {
             {
                 name: 'B-Wing',
                 img: 'assets/images/rebel_alliance/bWing.png',
-                hp: 3,
+                hp: 2,
                 isDestroyed: false,
             },
             {
@@ -73,6 +73,18 @@ const LOOKUP = {
                 name: 'GR-Transport',
                 img: 'assets/images/rebel_alliance/grTransport.png',
                 hp: 3,
+                isDestroyed: false,
+            },
+            {
+                name: 'Hammerhead Corvette',
+                img: 'assets/images/rebel_alliance/hammerheadCorvette.png',
+                hp: 4,
+                isDestroyed: false,
+            },
+            {
+                name: 'A-Wing',
+                img: 'assets/images/rebel_alliance/aWing.png',
+                hp: 1,
                 isDestroyed: false,
             },
         ],
@@ -143,23 +155,11 @@ function init() {
 }
 
 function render() {
-    renderPlayerBoard();
     renderComputerBoard();
     renderControls();
 }
 
 function renderComputerBoard() {}
-
-function renderPlayerBoard() {
-    playerBoard.forEach(function (colArr, rowIdx) {
-        colArr.forEach(function (cellVal, colIdx) {
-            const cellEl = document.getElementById(
-                `${rowIdx + 1}-${colIdx + 1}`
-            );
-            cellEl.style.backgroundColor = 'pink';
-        });
-    });
-}
 
 function renderControls() {}
 
@@ -196,7 +196,13 @@ function renderShipDock() {
         (cell) => cell.childElementCount >= 1
     ).length;
     renderShipName(LOOKUP[alliance].ships[count]);
-    if (count > 4) return;
+    if (
+        (alliance === 'galacticEmpire' && count > 4) ||
+        (alliance === 'rebelAlliance' && count > 6)
+    ) {
+        return;
+    }
+    console.log(count);
     const newIMG = document.createElement('img');
     newIMG.classList.add('ship-image');
     newIMG.id = `${alliance}-${Math.abs(count)}`;
@@ -221,8 +227,6 @@ function handleButtonRotate() {
 function handleResetPlacement() {
     playerCells.forEach(function (cell) {
         cell.innerHTML = '';
-        cell.style.gridColumn = '';
-        cell.style.gridRow = '';
         cell.style.backgroundColor = 'transparent';
     });
     shipDockIMGEls.innerHTML = '';
@@ -303,7 +307,9 @@ function getShipHoverLength(e) {
 function cellColorOnHover(e) {
     const { parentAndIndex } = getShipHoverLength(e);
     const backgroundColor =
-        e.type === 'dragleave' || e.type === 'drop' ? 'transparent' : 'purple';
+        e.type === 'dragleave' || e.type === 'drop'
+            ? 'transparent'
+            : LOOKUP[alliance].colors.hit;
     parentAndIndex.forEach((cell) => {
         const hoveredCells = playerCells[cell.index];
         hoveredCells.style.backgroundColor = backgroundColor;
