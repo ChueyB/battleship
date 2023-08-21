@@ -102,7 +102,8 @@ h1 {
     grid-row: 2 /4; */
     grid-column: 2 / 3;
     grid-row: 2 /4;
-    display: grid;
+    display: none;
+    position: relative;
 }
 
 #player-board > div,
@@ -153,6 +154,10 @@ h1 {
     text-align: center;
 }
 
+#ship-name {
+    color: white;
+}
+
 #instructions-container {
     grid-column: 3 / 4;
     grid-row: 2 / 4;
@@ -174,11 +179,49 @@ h1 {
     height: 100%;
 }
 
-#ship-image {
+.ship-image {
     z-index: 1;
     width: 5vmin;
     rotate: 0deg;
 }
+
+/* Rebel Alliance Ships */
+
+#rebelAlliance-0 {
+    height: 1;
+}
+
+/* Galactic Empire Ships */
+
+#galacticEmpire-0 {
+    height: 100%;
+    width: 100%;
+}
+
+/* #galacticEmpire-1 {
+    height: 100%;
+    width: 100%;
+}
+
+#galacticEmpire-2 {
+    height: 100%;
+    width: 100%;
+}
+
+#galacticEmpire-3 {
+    height: 100%;
+    width: 100%;
+}
+
+#galacticEmpire-4 {
+    height: 100%;
+    width: 100%;
+}
+
+#galacticEmpire-5 {
+    height: 100%;
+    width: 100%;
+} */
 
 .space {
     z-index: -2;
