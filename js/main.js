@@ -123,9 +123,11 @@ const playerBoardEl = document.querySelector('#player-board');
 const computerBoardEl = document.querySelector('#computer-board');
 const shipName = document.getElementById('ship-name');
 const playBtn = document.getElementById('play-btn');
+const restartBtn = document.getElementById('restart-btn');
 
 /*----- event listeners -----*/
 playBtn.addEventListener('click', handlePlay);
+restartBtn.addEventListener('click', handleRestartGame);
 document
     .getElementById('modal-content')
     .addEventListener('click', handleAllianceChoice);
@@ -200,7 +202,19 @@ function handlePlay() {
 
     renderScores(alliance);
     game = 1;
+    renderButtons();
     playMusic();
+}
+
+function handleRestartGame() {}
+
+function renderButtons() {
+    if (game) {
+        playBtn.style.display = 'none';
+        restartBtn.style.display = 'grid';
+    } else {
+        (playBtn.style.display = 'grid'), (restartBtn.style.display = 'none');
+    }
 }
 
 function renderScores(ally) {
