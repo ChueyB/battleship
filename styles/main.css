@@ -20,7 +20,7 @@ body {
 }
 
 #modal {
-    display: flex;
+    display: none;
     position: absolute;
     top: 0;
     left: 0;
@@ -97,9 +97,6 @@ h1 {
 }
 
 #player-board {
-    /* REMOVE THIS COMMENTED INFO WHEN DONE WITH IT */
-    /* grid-column: 3 / 4;
-    grid-row: 2 /4; */
     grid-column: 2 / 3;
     grid-row: 2 /4;
     display: none;

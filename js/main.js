@@ -116,11 +116,16 @@ const modal = document.getElementById('modal');
 const playerCells = [...document.querySelectorAll('#player-board > div')];
 const computerCells = [...document.querySelectorAll('#computer-board > div')];
 const shipDockIMGEls = document.querySelector('#all-ships');
+const shipDock = document.getElementById('ship-dock');
+const scores = document.getElementById('scores');
+const instructions = document.getElementById('instructions-container');
 const playerBoardEl = document.querySelector('#player-board');
+const computerBoardEl = document.querySelector('#computer-board');
 const shipName = document.getElementById('ship-name');
+const playBtn = document.getElementById('play-btn');
 
 /*----- event listeners -----*/
-document.getElementById('play-reset').addEventListener('click', playMusic);
+playBtn.addEventListener('click', handlePlay);
 document
     .getElementById('modal-content')
     .addEventListener('click', handleAllianceChoice);
@@ -149,24 +154,25 @@ function init() {
     dragged = null;
     rotated = false;
     playerBoard = [];
-    computerBoard = createBoards(10, 10);
+    computerBoard = [];
 
     render();
 }
 
 function render() {
+    renderModal();
     renderComputerBoard();
     renderPlayerBoard();
-    renderControls();
 }
 
-function renderComputerBoard() {}
+function renderComputerBoard() {
+    computerBoard = createBoards(10, 10);
+}
 
 function renderPlayerBoard() {
     playerBoard = createBoards(10, 10);
+    playerBoardEl.style.gridColumn = '2 / 3';
 }
-
-function renderControls() {}
 
 function playMusic() {
     AUDIO.volume = 0.05;
@@ -186,19 +192,53 @@ function handleCellClick(e) {
     }
 }
 
+function handlePlay() {
+    computerBoardEl.style.display = 'grid';
+    shipDock.style.display = 'none';
+    instructions.style.display = 'none';
+    playerBoardEl.style.gridColumn = '3 / 4';
+
+    renderScores(alliance);
+    game = 1;
+    playMusic();
+}
+
+function renderScores(ally) {
+    scores.style.display = 'grid';
+    scores.children[0].style.backgroundColor =
+        LOOKUP[getEnemyAlliance(ally)].colors.hit;
+    scores.children[1].style.backgroundColor = LOOKUP[ally].colors.hit;
+    if (!game) return;
+}
+
+function getEnemyAlliance(ally) {
+    const enemyAlliance = Object.keys(LOOKUP).filter(
+        (key) => key !== 'special' && key !== ally
+    );
+    return enemyAlliance;
+}
+
 // Handles the modal choice prior to starting the game
+function renderModal() {
+    modal.style.display = 'flex';
+    playerBoardEl.style.display = 'none';
+    handleResetPlacement();
+}
+
 function handleAllianceChoice(e) {
     if (e.target.tagName !== 'IMG') return;
     alliance = e.target.id;
     modal.style.display = 'none';
     playerBoardEl.style.display = 'grid';
     renderShipDock();
+    renderInstructions();
 }
 
 // Everything below handles all pre-game ship functions
 
 function renderShipDock() {
     if (!alliance) return;
+    shipDock.style.display = 'grid';
     let count = playerCells.filter(
         (cell) => cell.childElementCount >= 1
     ).length;
@@ -214,6 +254,10 @@ function renderShipDock() {
     newIMG.id = `${alliance}-${Math.abs(count)}`;
     newIMG.src = LOOKUP[alliance].ships[count].img;
     shipDockIMGEls.appendChild(newIMG);
+}
+
+function renderInstructions() {
+    instructions.style.display = 'flex';
 }
 
 function renderShipName(ship) {
