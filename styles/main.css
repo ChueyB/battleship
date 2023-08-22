@@ -40,6 +40,7 @@ button:hover {
 
 h1 {
     font-family: var(--starwars);
+    font-size: 5vmin;
     letter-spacing: 0.1rem;
     color: black;
     text-shadow: 2px 0 #ffe81f, -2px 0 #ffe81f, 0 2px #ffe81f, 0 -2px #ffe81f,

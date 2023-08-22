@@ -110,6 +110,7 @@ let playerBoard;
 let computerBoard;
 let dragged;
 let rotated;
+let turn;
 
 /*----- cached elements  -----*/
 const modal = document.getElementById('modal');
@@ -157,6 +158,7 @@ function init() {
     rotated = false;
     playerBoard = [];
     computerBoard = [];
+    turn = 1;
 
     render();
 }
@@ -182,7 +184,7 @@ function playMusic() {
 }
 
 function createBoards(rows, cols) {
-    return new Array(rows).fill(null).map(() => new Array(cols).fill(null));
+    return new Array(rows).fill(0).map(() => new Array(cols).fill(0));
 }
 
 function handleCellClick(e) {
@@ -195,6 +197,7 @@ function handleCellClick(e) {
 }
 
 function handlePlay() {
+    if (shipDockIMGEls.childElementCount >= 1) return;
     computerBoardEl.style.display = 'grid';
     shipDock.style.display = 'none';
     instructions.style.display = 'none';
@@ -213,7 +216,8 @@ function renderButtons() {
         playBtn.style.display = 'none';
         restartBtn.style.display = 'grid';
     } else {
-        (playBtn.style.display = 'grid'), (restartBtn.style.display = 'none');
+        playBtn.style.display = 'grid';
+        restartBtn.style.display = 'none';
     }
 }
 
@@ -246,6 +250,66 @@ function handleAllianceChoice(e) {
     playerBoardEl.style.display = 'grid';
     renderShipDock();
     renderInstructions();
+    renderButtons();
+    setComputerShips();
+}
+// Handle Turns
+function nextTurn() {
+    turn *= -1;
+}
+
+// Set Computer Board Ship Locations
+function setComputerShips() {
+    const enemyShips = LOOKUP[getEnemyAlliance(alliance)].ships;
+    const rows = computerBoard.length;
+    const cols = computerBoard[0].length;
+
+    enemyShips.forEach((ship) => {
+        let placementIsValid = false;
+
+        while (!placementIsValid) {
+            const startRow = Math.floor(Math.random() * (rows - ship.hp + 1));
+            const startCol = Math.floor(Math.random() * (cols - ship.hp + 1));
+            const isVertical = Math.random() < 0.5;
+
+            let canPlace = true;
+
+            if (isVertical) {
+                for (let i = 0; i < ship.hp; i++) {
+                    if (
+                        startRow + i >= rows ||
+                        computerBoard[startRow + i][startCol] !== 0
+                    ) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+            } else {
+                for (let i = 0; i < ship.hp; i++) {
+                    if (
+                        startCol + i >= cols ||
+                        computerBoard[startRow][startCol + i] !== 0
+                    ) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+            }
+
+            if (canPlace) {
+                if (isVertical) {
+                    for (let i = 0; i < ship.hp; i++) {
+                        computerBoard[startRow + i][startCol] = ship.name;
+                    }
+                } else {
+                    for (let i = 0; i < ship.hp; i++) {
+                        computerBoard[startRow][startCol + i] = ship.name;
+                    }
+                }
+                placementIsValid = true;
+            }
+        }
+    });
 }
 
 // Everything below handles all pre-game ship functions
