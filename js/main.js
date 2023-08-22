@@ -17,7 +17,7 @@ const LOOKUP = {
             {
                 name: 'CR-90',
                 img: 'assets/images/galactic_empire/cr90.png',
-                hp: 2,
+                hp: 3,
                 isDestroyed: false,
             },
             {
@@ -148,7 +148,7 @@ function init() {
     game = false;
     dragged = null;
     rotated = false;
-    playerBoard = createBoards(10, 10);
+    playerBoard = [];
     computerBoard = createBoards(10, 10);
 
     render();
@@ -156,10 +156,15 @@ function init() {
 
 function render() {
     renderComputerBoard();
+    renderPlayerBoard();
     renderControls();
 }
 
 function renderComputerBoard() {}
+
+function renderPlayerBoard() {
+    playerBoard = createBoards(10, 10);
+}
 
 function renderControls() {}
 
@@ -190,6 +195,8 @@ function handleAllianceChoice(e) {
     renderShipDock();
 }
 
+// Everything below handles all pre-game ship functions
+
 function renderShipDock() {
     if (!alliance) return;
     let count = playerCells.filter(
@@ -202,7 +209,6 @@ function renderShipDock() {
     ) {
         return;
     }
-    console.log(count);
     const newIMG = document.createElement('img');
     newIMG.classList.add('ship-image');
     newIMG.id = `${alliance}-${Math.abs(count)}`;
@@ -231,14 +237,12 @@ function handleResetPlacement() {
     });
     shipDockIMGEls.innerHTML = '';
     rotated = false;
+    renderPlayerBoard();
     renderShipDock();
 }
 
 function imageIntoGrid(e) {
     const { matchingCells } = getShipHoverLength(e);
-    // const splitArray = e.target.id.split('-');
-    // const rowStart = parseInt(splitArray[0]);
-    // const colStart = parseInt(splitArray[1]);
     const [allianceName, shipID] = dragged.id.split('-');
     const shipHealth = LOOKUP[allianceName].ships[shipID].hp;
     const parentAndIndex = [];
@@ -249,16 +253,20 @@ function imageIntoGrid(e) {
         });
     });
 
-    // Calculate the width and height of the image based on the grid cells
+    const [getRow, getCol] = matchingCells[0].id.split('-');
     const cellWidth = matchingCells[0].clientWidth;
     const cellHeight = matchingCells[0].clientHeight;
-    const imgHeight = cellWidth;
-    const imgWidth = cellHeight * shipHealth;
+    const imgWidth = cellWidth * shipHealth;
+    const imgHeight = cellHeight;
 
     // Set the image's style
     dragged.style.position = 'absolute';
     dragged.style.width = `${imgWidth}px`;
     dragged.style.height = `${imgHeight}px`;
+    if (rotated) {
+        dragged.style.transformOrigin = 'bottom left';
+        dragged.style.top = `${getRow - 2}0%`;
+    }
 }
 
 function getShipHoverLength(e) {
@@ -283,8 +291,8 @@ function getShipHoverLength(e) {
                 });
                 return true;
             }
-        } else if (rotated) {
-            if (colStart === col && rowStart < row + hp && rowStart >= row) {
+        } else {
+            if (colStart === col && rowStart >= row && rowStart < row + hp) {
                 parentAndIndex.push({
                     parent: cell.parentElement,
                     index: Array.from(cell.parentElement.children).indexOf(
@@ -293,8 +301,6 @@ function getShipHoverLength(e) {
                 });
                 return true;
             }
-        } else {
-            return false;
         }
     });
 
@@ -322,6 +328,14 @@ function getShipLength(e) {
     return LOOKUP[chosenAlliance].ships[`${shipIdx}`].hp;
 }
 
+function handleArrayPlacement(obj) {
+    const { matchingCells } = obj;
+    matchingCells.forEach((cell) => {
+        const [row, col] = cell.id.split('-');
+        playerBoard[row - 1][col - 1] = 1;
+    });
+}
+
 // Handles the drag and drop functionality of the Ship Dock
 function handleDragStart(e) {
     dragged = e.target;
@@ -340,9 +354,7 @@ function handleDragLeave(e) {
 
 function handleDrop(e) {
     e.preventDefault();
-    if (cellColorOnHover(e) < getShipLength(dragged)) {
-        return;
-    }
+    if (cancelDrop(e)) return;
 
     if (e.target.tagName === 'DIV') {
         dragged.parentNode.removeChild(dragged);
@@ -351,5 +363,19 @@ function handleDrop(e) {
 
     if (shipDockIMGEls.childElementCount >= 1) return;
     imageIntoGrid(e);
+    handleArrayPlacement(getShipHoverLength(e));
     renderShipDock();
+    dragged = null;
+    rotated = false;
+}
+
+function cancelDrop(e) {
+    if (cellColorOnHover(e) < getShipLength(dragged)) {
+        return true;
+    }
+    const { matchingCells } = getShipHoverLength(e);
+    return matchingCells.some((cell) => {
+        const [row, col] = cell.id.split('-');
+        return playerBoard[row - 1][col - 1] === 1;
+    });
 }

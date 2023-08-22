@@ -185,44 +185,6 @@ h1 {
     rotate: 0deg;
 }
 
-/* Rebel Alliance Ships */
-
-#rebelAlliance-0 {
-    height: 1;
-}
-
-/* Galactic Empire Ships */
-
-#galacticEmpire-0 {
-    height: 100%;
-    width: 100%;
-}
-
-/* #galacticEmpire-1 {
-    height: 100%;
-    width: 100%;
-}
-
-#galacticEmpire-2 {
-    height: 100%;
-    width: 100%;
-}
-
-#galacticEmpire-3 {
-    height: 100%;
-    width: 100%;
-}
-
-#galacticEmpire-4 {
-    height: 100%;
-    width: 100%;
-}
-
-#galacticEmpire-5 {
-    height: 100%;
-    width: 100%;
-} */
-
 .space {
     z-index: -2;
     background: #000 url('https://i.imgur.com/YKY28eT.png') repeat top center;
@@ -232,7 +194,7 @@ h1 {
     z-index: -1;
     background: transparent url('https://i.imgur.com/XYMF4ca.png') repeat top
         center;
-    animation: move-twink-back 800s linear infinite;
+    animation: move-twink-back 600s linear infinite;
 }
 
 @keyframes move-twink-back {
