@@ -12,31 +12,26 @@ const LOOKUP = {
                 name: 'Bellator Dreadnaught',
                 img: 'assets/images/galactic_empire/bellatorDreadnaught.png',
                 hp: 3,
-                isDestroyed: false,
             },
             {
-                name: 'CR-90',
+                name: 'CR 90',
                 img: 'assets/images/galactic_empire/cr90.png',
                 hp: 3,
-                isDestroyed: false,
             },
             {
                 name: 'Imperial Freighter',
                 img: 'assets/images/galactic_empire/imperialFreighter.png',
                 hp: 3,
-                isDestroyed: false,
             },
             {
                 name: 'Dreadnaught Cruiser',
                 img: 'assets/images/galactic_empire/dreadnaughtCruiser.png',
                 hp: 6,
-                isDestroyed: false,
             },
             {
                 name: 'Tie Fighter',
                 img: 'assets/images/galactic_empire/tieFighter.png',
                 hp: 1,
-                isDestroyed: false,
             },
         ],
     },
@@ -47,46 +42,39 @@ const LOOKUP = {
         },
         ships: [
             {
-                name: 'X-Wing',
+                name: 'X Wing',
                 img: 'assets/images/rebel_alliance/xWing.png',
                 hp: 1,
-                isDestroyed: false,
             },
             {
-                name: 'Y-Wing',
+                name: 'Y Wing',
                 img: 'assets/images/rebel_alliance/yWing.png',
                 hp: 2,
-                isDestroyed: false,
             },
             {
-                name: 'B-Wing',
+                name: 'B Wing',
                 img: 'assets/images/rebel_alliance/bWing.png',
                 hp: 2,
-                isDestroyed: false,
             },
             {
-                name: 'H6-Bomber',
+                name: 'H6 Bomber',
                 img: 'assets/images/rebel_alliance/h6Bomber.png',
                 hp: 2,
-                isDestroyed: false,
             },
             {
-                name: 'GR-Transport',
+                name: 'GR Transport',
                 img: 'assets/images/rebel_alliance/grTransport.png',
                 hp: 3,
-                isDestroyed: false,
             },
             {
                 name: 'Hammerhead Corvette',
                 img: 'assets/images/rebel_alliance/hammerheadCorvette.png',
                 hp: 4,
-                isDestroyed: false,
             },
             {
-                name: 'A-Wing',
+                name: 'A Wing',
                 img: 'assets/images/rebel_alliance/aWing.png',
                 hp: 1,
-                isDestroyed: false,
             },
         ],
     },
@@ -95,7 +83,6 @@ const LOOKUP = {
             name: 'Deathstar',
             img: 'assets/images/galactic_empire/deathstar.png',
             hp: 100,
-            isDestroyed: false,
         },
     },
 };
@@ -115,7 +102,7 @@ let computerBoard;
 let dragged;
 let rotated;
 let turn;
-let lastComputerHit;
+let lastComputerHits;
 
 /*----- cached elements  -----*/
 const modal = document.getElementById('modal');
@@ -156,11 +143,11 @@ function init() {
     alliance = null;
     enemyAlliance = null;
     winner = null;
-    score = [];
+    score = [0, 0];
     game = false;
     dragged = null;
     rotated = false;
-    lastComputerHit = [];
+    lastComputerHits = [0, 0];
     playerBoard = [];
     computerBoard = [];
     turn = 'Player';
@@ -270,55 +257,90 @@ function handleClickingEnemyBoard(e) {
     if (e.target.tagName !== 'DIV' || !game || turn === 'Computer') return;
     const [rowIdx, colIdx] = e.target.id.split('-');
     const boardCell = computerBoard[rowIdx - 1][colIdx - 1];
-    if (boardCell === 1) return;
+    const [hit, miss] = [1, 2];
+    if (boardCell === 1 || boardCell === 2) return;
     if (boardCell) {
         e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
-        handleHits(rowIdx, colIdx);
+        handleHits(rowIdx, colIdx, hit);
         updateScores(alliance);
     } else {
         e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.miss;
-        handleHits(rowIdx, colIdx);
+        handleHits(rowIdx, colIdx, miss);
     }
     nextTurn();
+    computerTurn();
 }
 
 function computerTurn() {
     if (turn === 'Player') return;
     const [ranRow, ranCol] = [
-        Math.floor(Math.random() * 100),
-        Math.floor(Math.random() * 100),
+        Math.floor(Math.random() * 10 + 1),
+        Math.floor(Math.random() * 10 + 1),
     ];
-    if (lastComputerHit) {
-        if (playerBoard[ranRow][ranCol]) {
+    const [hit, miss] = [1, 2];
+    const cellEl = playerCells.find(
+        (cell) => cell.id === `${ranRow}-${ranCol}`
+    );
+    const arrayEl = playerBoard[ranRow - 1][ranCol - 1];
+
+    let cellIsValid = false;
+
+    while (!cellIsValid) {
+        if (!arrayEl) {
+            handleHits(ranRow, ranCol, miss);
+            cellEl.style.backgroundColor = LOOKUP[alliance].colors.miss;
+            cellIsValid = true;
+        } else if (typeof arrayEl === 'string' || arrayEl instanceof String) {
+            handleHits(ranRow, ranCol, hit);
+            cellEl.style.backgroundColor = LOOKUP[alliance].colors.hit;
+            cellIsValid = true;
+        } else if (lastComputerHits[0][2] === hit) {
+            handleGuessNextCell(lastComputerHits[0][0], lastComputerHits[0][1]);
+        } else {
+            computerTurn();
+            break;
         }
-    } else if (playerBoard[ranRow][ranCol]) {
+    }
+    if (cellIsValid) {
+        nextTurn();
     }
 }
 
-function handleHits(rowIdx, colIdx) {
+function handleGuessNextCell(rowIdx, colIdx) {}
+
+function handleHits(rowIdx, colIdx, hitOrMiss) {
     const nameOfShip =
         turn === 'Player'
             ? computerBoard[rowIdx - 1][colIdx - 1]
             : playerBoard[rowIdx - 1][colIdx - 1];
-    const currentAllianceTurn = turn === 'Player' ? alliance : enemyAlliance;
-    const shipInLookup = LOOKUP[currentAllianceTurn].ships.find(
+    const currentEnemyAlliance = turn === 'Player' ? enemyAlliance : alliance;
+    const shipInLookup = LOOKUP[currentEnemyAlliance].ships.find(
         (ship) => ship.name === nameOfShip
     );
+
     if (turn === 'Player') {
-        computerBoard[rowIdx - 1][colIdx - 1] = 1;
+        computerBoard[rowIdx - 1][colIdx - 1] = hitOrMiss;
     } else {
-        lastComputerHit = [rowIdx, colIdx];
-        playerBoard[rowIdx - 1][colIdx - 1] = 1;
+        lastComputerHits[0] = [rowIdx, colIdx, hitOrMiss];
+        playerBoard[rowIdx - 1][colIdx - 1] = hitOrMiss;
     }
+
     if (!nameOfShip) return;
+    console.log(shipInLookup);
     shipInLookup.hp -= 1;
 }
 
 function updateScores() {
-    score[0] = LOOKUP[alliance].ships.filter((ship) => ship.hp === 0).length;
-    score[1] = LOOKUP[enemyAlliance].ships.filter(
+    const playerShipsDestroyed = LOOKUP[alliance].ships.filter(
         (ship) => ship.hp === 0
     ).length;
+    const totalPlayerShips = LOOKUP[alliance].ships.length;
+    const computerShipsDestroyed = LOOKUP[enemyAlliance].ships.filter(
+        (ship) => ship.hp === 0
+    ).length;
+    const totalComputerShips = LOOKUP[enemyAlliance].ships.length;
+    score[1] = `${playerShipsDestroyed} / ${totalPlayerShips}`;
+    score[0] = `${computerShipsDestroyed} / ${totalComputerShips}`;
     renderScores(alliance);
 }
 
@@ -393,7 +415,9 @@ function renderShipDock() {
     }
     const newIMG = document.createElement('img');
     newIMG.classList.add('ship-image');
-    newIMG.id = `${alliance}-${Math.abs(count)}`;
+    newIMG.id = `${alliance}-${Math.abs(count)}-${
+        LOOKUP[alliance].ships[count].name
+    }`;
     newIMG.src = LOOKUP[alliance].ships[count].img;
     shipDockIMGEls.appendChild(newIMG);
 }
@@ -430,15 +454,8 @@ function handleResetPlacement() {
 // Properly place the image into the grid
 function imageIntoGrid(e) {
     const { matchingCells } = getShipHoverLength(e);
-    const [allianceName, shipID] = dragged.id.split('-');
+    const [allianceName, shipID, shipName] = dragged.id.split('-');
     const shipHealth = LOOKUP[allianceName].ships[shipID].hp;
-    const parentAndIndex = [];
-    matchingCells.forEach((cell) => {
-        parentAndIndex.push({
-            parent: cell.parentElement,
-            index: Array.from(cell.parentElement.children).indexOf(cell),
-        });
-    });
 
     const [getRow, getCol] = matchingCells[0].id.split('-');
     const cellWidth = matchingCells[0].clientWidth;
@@ -457,7 +474,7 @@ function imageIntoGrid(e) {
 
 function getShipHoverLength(e) {
     const divEls = e.target.id.split('-');
-    const [allianceName, shipID] = dragged.id.split('-');
+    const [allianceName, shipID, shipName] = dragged.id.split('-');
     const hp = LOOKUP[allianceName].ships[shipID].hp;
     const row = parseInt(divEls[0]);
     const col = parseInt(divEls[1]);
@@ -493,6 +510,7 @@ function getShipHoverLength(e) {
     return {
         matchingCells,
         parentAndIndex,
+        shipName,
     };
 }
 
@@ -515,10 +533,11 @@ function getShipLength(e) {
 }
 
 function handleArrayPlacement(obj) {
-    const { matchingCells } = obj;
+    const { matchingCells, shipName } = obj;
+    console.log(matchingCells);
     matchingCells.forEach((cell) => {
         const [row, col] = cell.id.split('-');
-        playerBoard[row - 1][col - 1] = 1;
+        playerBoard[row - 1][col - 1] = shipName;
     });
 }
 
