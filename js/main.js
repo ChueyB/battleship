@@ -5,7 +5,7 @@ const LOOKUP = {
     galacticEmpire: {
         colors: {
             hit: 'rgba(184, 60, 65, 0.8)',
-            miss: '',
+            miss: 'rgba(255, 255, 255, 0.7)',
         },
         ships: [
             {
@@ -43,6 +43,7 @@ const LOOKUP = {
     rebelAlliance: {
         colors: {
             hit: 'rgba(32, 80, 131, 0.8)',
+            miss: 'rgba(255, 255, 255, 0.7)',
         },
         ships: [
             {
@@ -106,6 +107,7 @@ let game;
 let winner;
 let score;
 let alliance;
+let enemyAlliance;
 let playerBoard;
 let computerBoard;
 let dragged;
@@ -143,14 +145,14 @@ shipDockIMGEls.addEventListener('dragstart', handleDragStart);
 playerBoardEl.addEventListener('dragover', handleDragOver);
 playerBoardEl.addEventListener('drop', handleDrop);
 playerBoardEl.addEventListener('dragleave', handleDragLeave);
-
-/*----- classes -----*/
+computerBoardEl.addEventListener('click', handleEnemyClick);
 
 /*----- functions -----*/
 init();
 
 function init() {
     alliance = null;
+    enemyAlliance = null;
     winner = null;
     score = [];
     game = false;
@@ -158,7 +160,7 @@ function init() {
     rotated = false;
     playerBoard = [];
     computerBoard = [];
-    turn = 1;
+    turn = 'Player';
 
     render();
 }
@@ -180,7 +182,13 @@ function renderPlayerBoard() {
 
 function playMusic() {
     AUDIO.volume = 0.05;
+    AUDIO.loop = true;
     AUDIO.play();
+}
+
+function stopMusic() {
+    AUDIO.pause();
+    AUDIO.currentTime = 0;
 }
 
 function createBoards(rows, cols) {
@@ -209,7 +217,9 @@ function handlePlay() {
     playMusic();
 }
 
-function handleRestartGame() {}
+function handleRestartGame() {
+    stopMusic();
+}
 
 function renderButtons() {
     if (game) {
@@ -223,8 +233,7 @@ function renderButtons() {
 
 function renderScores(ally) {
     scores.style.display = 'grid';
-    scores.children[0].style.backgroundColor =
-        LOOKUP[getEnemyAlliance(ally)].colors.hit;
+    scores.children[0].style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
     scores.children[1].style.backgroundColor = LOOKUP[ally].colors.hit;
     if (!game) return;
 }
@@ -246,6 +255,7 @@ function renderModal() {
 function handleAllianceChoice(e) {
     if (e.target.tagName !== 'IMG') return;
     alliance = e.target.id;
+    enemyAlliance = getEnemyAlliance(alliance);
     modal.style.display = 'none';
     playerBoardEl.style.display = 'grid';
     renderShipDock();
@@ -255,12 +265,33 @@ function handleAllianceChoice(e) {
 }
 // Handle Turns
 function nextTurn() {
-    turn *= -1;
+    turn = turn === 'Player' ? 'Computer' : 'Player';
+}
+
+// Handle Clicking on enemy board
+function handleEnemyClick(e) {
+    if (e.target.tagName !== 'DIV') return;
+    const [rowIdx, colIdx] = e.target.id.split('-');
+    const boardCell = computerBoard[rowIdx - 1][colIdx - 1];
+    if (boardCell) {
+        e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
+        handleHits(rowIdx, colIdx, computerBoard, enemyAlliance);
+    } else {
+        e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.miss;
+    }
+}
+
+function handleHits(rowIdx, colIdx, boardArr, ally) {
+    const nameOfShip = boardArr[rowIdx - 1][colIdx - 1];
+    const shipInLookup = LOOKUP[ally].ships.find(
+        (ship) => ship.name === nameOfShip
+    );
+    shipInLookup.hp -= 1;
 }
 
 // Set Computer Board Ship Locations
 function setComputerShips() {
-    const enemyShips = LOOKUP[getEnemyAlliance(alliance)].ships;
+    const enemyShips = LOOKUP[enemyAlliance].ships;
     const rows = computerBoard.length;
     const cols = computerBoard[0].length;
 
