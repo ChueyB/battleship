@@ -19,7 +19,8 @@ body {
     transition-duration: 2s;
 }
 
-#modal {
+#modal,
+#endgame-modal {
     display: none;
     position: absolute;
     top: 0;
@@ -47,7 +48,7 @@ h1 {
         1px 1px #ffe81f, -1px -1px #ffe81f, 1px -1px #ffe81f, -1px 1px #ffe81f;
 }
 
-#modal-content {
+.modal-content {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -57,7 +58,7 @@ h1 {
     text-align: center;
     background-color: black;
 }
-#modal-content > img {
+.modal-content > img {
     display: flex;
     height: 20vmin;
     border-radius: 50%;
