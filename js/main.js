@@ -100,7 +100,9 @@ const LOOKUP = {
     },
 };
 
-const AUDIO = new Audio('../assets/sounds/dueloffates.mp3');
+const AUDIO = new Audio(
+    'https://github.com/ChueyB/battleship/blob/main/assets/sounds/dueloffates.mp3?raw=true'
+);
 
 /*----- state variables -----*/
 let game;
