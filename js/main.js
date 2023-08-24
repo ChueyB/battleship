@@ -205,7 +205,7 @@ function handlePlay() {
 function handleRestartGame() {
     computerBoardEl.style.display = 'none';
     shipDock.style.display = 'grid';
-    instructions.style.display = 'grid';
+    instructions.style.display = 'flex';
     playerBoardEl.style.gridColumn = '2 / 4';
     scoresEl.style.display = 'none';
 
@@ -262,7 +262,6 @@ function handleAllianceChoice(e) {
     modal.style.display = 'none';
     playerBoardEl.style.display = 'grid';
     renderShipDock();
-    renderInstructions();
     renderButtons();
     setComputerShips();
     renderMessage()
@@ -517,10 +516,6 @@ function renderShipDock() {
         }`;
     newIMG.src = LOOKUP[alliance].ships[count].img;
     shipDockIMGEls.appendChild(newIMG);
-}
-
-function renderInstructions() {
-    instructions.style.display = 'flex';
 }
 
 function renderShipName(ship) {
