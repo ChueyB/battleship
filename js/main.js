@@ -3,6 +3,7 @@
 /*----- constants -----*/
 const LOOKUP = {
     galacticEmpire: {
+        name: "Galactic Empire",
         colors: {
             hit: 'rgba(184, 60, 65, 0.8)',
             miss: 'rgba(255, 255, 255, 0.7)',
@@ -36,6 +37,7 @@ const LOOKUP = {
         ],
     },
     rebelAlliance: {
+        name: "Rebel Alliance",
         colors: {
             hit: 'rgba(32, 80, 131, 0.8)',
             miss: 'rgba(255, 255, 255, 0.7)',
@@ -106,6 +108,7 @@ let lastComputerHits;
 
 /*----- cached elements  -----*/
 const modal = document.getElementById('modal');
+const message = document.getElementById('message')
 const playerCells = [...document.querySelectorAll('#player-board > div')];
 const computerCells = [...document.querySelectorAll('#computer-board > div')];
 const shipDockIMGEls = document.querySelector('#all-ships');
@@ -193,15 +196,24 @@ function handlePlay() {
     instructions.style.display = 'none';
     playerBoardEl.style.gridColumn = '3 / 4';
 
-    renderScores(alliance);
+    updateScores();
     game = 1;
     renderButtons();
     playMusic();
 }
 
 function handleRestartGame() {
+    computerBoardEl.style.display = 'none';
+    shipDock.style.display = 'grid';
+    instructions.style.display = 'grid';
+    playerBoardEl.style.gridColumn = '2 / 4';
+    scoresEl.style.display = 'none';
+
+    game = 0;
     lastComputerHits.length = 0;
+    renderModal()
     stopMusic();
+    init();
 }
 
 function renderButtons() {
@@ -238,6 +250,7 @@ function getEnemyAlliance(ally) {
 function renderModal() {
     modal.style.display = 'flex';
     playerBoardEl.style.display = 'none';
+    shipDockIMGEls.innerHTML = '';
     handleResetPlacement();
 }
 
@@ -252,7 +265,17 @@ function handleAllianceChoice(e) {
     renderInstructions();
     renderButtons();
     setComputerShips();
+    renderMessage()
 }
+
+function renderMessage(ally, hitOrMiss) {
+    if (!game) {
+        message.innerHTML = `Welcome to the <span style="color:${LOOKUP[alliance].colors.hit};">${LOOKUP[alliance].name}</span>`
+    } else {
+        message.innerHTML = `<span style="color:${LOOKUP[ally].colors.hit};">${turn}</span> ${hitOrMiss}`
+    }
+}
+
 // Handle Turns
 function nextTurn() {
     turn = turn === 'Player' ? 'Computer' : 'Player';
@@ -270,14 +293,14 @@ function handleClickingEnemyBoard(e) {
     if (boardCell) {
         e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
         handleHits(rowIdx - 1, colIdx - 1, hit);
-        updateScores(alliance);
+        updateScores();
     } else {
         e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.miss;
         handleHits(rowIdx - 1, colIdx - 1, miss);
     }
 
     nextTurn();
-    setTimeout(computerTurn, 1000);
+    setTimeout(computerTurn, 500);
 }
 
 function computerTurn() {
@@ -288,20 +311,26 @@ function computerTurn() {
     const [hit, miss] = ['hit', 'miss'];
 
     if (lastComputerHits.at(-1)[2] === hit) {
+        console.log('Checking randomly around');
         handleGuessNextCell(
             lastComputerHits.at(-1)[0],
             lastComputerHits.at(-1)[1]
         );
     } else if (!arrayEl) {
-        console.log(ranRow, ranCol);
+        console.log('!arrayEl');
         handleHits(ranRow, ranCol, miss);
-    } else if (typeof arrayEl === 'string' || arrayEl instanceof String) {
-        console.log(ranRow, ranCol);
+    } else if (
+        (typeof arrayEl === 'string' || arrayEl instanceof String) &&
+        arrayEl !== 'miss' &&
+        arrayEl !== 'hit'
+    ) {
+        console.log('type of === string');
         handleHits(ranRow, ranCol, hit);
     } else {
-        console.log('chuey broke something');
+        return computerTurn();
     }
 
+    updateScores();
     nextTurn();
 }
 
@@ -309,20 +338,34 @@ function getRandomPosition() {
     return [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
 }
 
+// if miss then miss
+// if hit then hit & store hit location
+// if last hit, generate random direction
+// check that direction for hit
+// if hit then hit & store hit location // if score increaes then delete hit location
+// if miss then miss
+// if hit existing hit/miss spot then rerun function
+
+
 function handleGuessNextCell(rowIdx, colIdx) {
     const [rowOffset, colOffset] = randomDirec();
     const newRow = rowIdx + rowOffset;
     const newCol = colIdx + colOffset;
 
     console.log(rowIdx, colIdx, ' | ', newRow, newCol);
-
     if (isValidPosition(newRow, newCol)) {
         if (!playerBoard[newRow][newCol]) {
             handleHits(newRow, newCol, 'miss');
-        } else if (playerBoard[newRow][newCol] === 'hit') {
-            handleGuessNextCell(rowIdx, colIdx);
-        } else {
+        } else if (
+            playerBoard[newRow][newCol] !== 'hit' ||
+            playerBoard[newRow][newCol] !== 'miss'
+        ) {
             handleHits(newRow, newCol, 'hit');
+        } else if (
+            playerBoard[newRow][newCol] === 'hit' ||
+            playerBoard[newRow][newCol] === 'miss'
+        ) {
+            handleGuessNextCell(rowIdx, colIdx);
         }
     } else {
         handleGuessNextCell(rowIdx, colIdx);
@@ -356,21 +399,24 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
         (ship) => ship.name === nameOfShip
     );
 
+    console.log('HandleHits: ', rowIdx, colIdx);
+
     const cellEl = currentCells.find(
         (cell) => cell.id === `${rowIdx + 1}-${colIdx + 1}`
     );
 
     if (turn === 'Player') {
         computerBoard[rowIdx][colIdx] = hitOrMiss;
+        renderMessage(alliance, hitOrMiss)
         cellEl.style.backgroundColor = LOOKUP[enemyAlliance].colors[hitOrMiss];
     } else {
-        if (hitOrMiss === 'hit') {
+        if (hitOrMiss === 'hit' || hitOrMiss === 'miss') {
             lastComputerHits.push([rowIdx, colIdx, hitOrMiss]);
         } else if (lastComputerHits.at(-1)[2] === 'hit') {
             lastComputerHits.pop();
         }
-
         playerBoard[rowIdx][colIdx] = hitOrMiss;
+        renderMessage(enemyAlliance, hitOrMiss)
         cellEl.style.backgroundColor = LOOKUP[alliance].colors[hitOrMiss];
     }
 
@@ -467,9 +513,8 @@ function renderShipDock() {
 
     const newIMG = document.createElement('img');
     newIMG.classList.add('ship-image');
-    newIMG.id = `${alliance}-${Math.abs(count)}-${
-        LOOKUP[alliance].ships[count].name
-    }`;
+    newIMG.id = `${alliance}-${Math.abs(count)}-${LOOKUP[alliance].ships[count].name
+        }`;
     newIMG.src = LOOKUP[alliance].ships[count].img;
     shipDockIMGEls.appendChild(newIMG);
 }
@@ -494,6 +539,10 @@ function handleButtonRotate() {
 
 function handleResetPlacement() {
     playerCells.forEach(function (cell) {
+        cell.innerHTML = '';
+        cell.style.backgroundColor = 'transparent';
+    });
+    computerCells.forEach(function (cell) {
         cell.innerHTML = '';
         cell.style.backgroundColor = 'transparent';
     });

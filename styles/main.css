@@ -64,6 +64,10 @@ h1 {
     border-radius: 50%;
 }
 
+#message {
+    color: white;
+}
+
 #game {
     margin: 0 auto;
     display: grid;
@@ -153,10 +157,35 @@ h1 {
     display: grid;
     justify-items: center;
     text-align: center;
+    min-width: 15rem;
+    max-width: 15rem;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, 1fr);
+}
+
+#buttons-container {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    display: grid;
+    gap: 10px;
 }
 
 #ship-name {
     color: white;
+    width: 100%;
+    grid-column: 1/ 2;
+    grid-row: 2 / 3;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+
+#all-ships {
+    grid-column: 1/ 2;
+    grid-row: 3 / 4;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
 }
 
 #instructions-container {
@@ -164,14 +193,18 @@ h1 {
     grid-row: 2 / 4;
     display: flex;
     color: white;
+    min-width: 15rem;
+    max-width: 15rem;
     flex-direction: column;
     align-items: center;
 }
 
 .ship-image {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
     z-index: 1;
-    width: 5vmin;
     rotate: 0deg;
+    width: 10rem;
 }
 
 .space,
