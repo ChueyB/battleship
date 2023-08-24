@@ -147,7 +147,7 @@ function init() {
     game = false;
     dragged = null;
     rotated = false;
-    lastComputerHits = [];
+    lastComputerHits = [[0, 0, 0]];
     playerBoard = [];
     computerBoard = [];
     turn = 'Player';
@@ -277,7 +277,7 @@ function handleClickingEnemyBoard(e) {
     }
 
     nextTurn();
-    setTimeout(computerTurn, 5000);
+    setTimeout(computerTurn, 1000);
 }
 
 function computerTurn() {
@@ -293,8 +293,10 @@ function computerTurn() {
             lastComputerHits.at(-1)[1]
         );
     } else if (!arrayEl) {
+        console.log(ranRow, ranCol);
         handleHits(ranRow, ranCol, miss);
     } else if (typeof arrayEl === 'string' || arrayEl instanceof String) {
+        console.log(ranRow, ranCol);
         handleHits(ranRow, ranCol, hit);
     } else {
         console.log('chuey broke something');
@@ -317,6 +319,8 @@ function handleGuessNextCell(rowIdx, colIdx) {
     if (isValidPosition(newRow, newCol)) {
         if (!playerBoard[newRow][newCol]) {
             handleHits(newRow, newCol, 'miss');
+        } else if (playerBoard[newRow][newCol] === 'hit') {
+            handleGuessNextCell(rowIdx, colIdx);
         } else {
             handleHits(newRow, newCol, 'hit');
         }
@@ -358,10 +362,12 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
 
     if (turn === 'Player') {
         computerBoard[rowIdx][colIdx] = hitOrMiss;
-        cellEl.style.backgroundColor = LOOKUP[alliance].colors[hitOrMiss];
+        cellEl.style.backgroundColor = LOOKUP[enemyAlliance].colors[hitOrMiss];
     } else {
         if (hitOrMiss === 'hit') {
             lastComputerHits.push([rowIdx, colIdx, hitOrMiss]);
+        } else if (lastComputerHits.at(-1)[2] === 'hit') {
+            lastComputerHits.pop();
         }
 
         playerBoard[rowIdx][colIdx] = hitOrMiss;
