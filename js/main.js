@@ -96,6 +96,7 @@ const AUDIO = new Audio(
 /*----- state variables -----*/
 let game;
 let winner;
+let loser;
 let score;
 let alliance;
 let enemyAlliance;
@@ -150,6 +151,7 @@ function init() {
     alliance = null;
     enemyAlliance = null;
     winner = null;
+    loser = null;
     score = [0, 0];
     game = false;
     dragged = null;
@@ -388,17 +390,20 @@ function handleGuessNextCell(rowIdx, colIdx) {
 function checkWinner() {
     const playerShipsDestroyed = LOOKUP[alliance].ships.filter((ship) => ship.hp === 0).length;
     const computerShipsDestroyed = LOOKUP[enemyAlliance].ships.filter((ship) => ship.hp === 0).length;
+    let loserShipCount;
     if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
-        winner = 'Computer Wins'
+        [winner, loser] = [LOOKUP[enemyAlliance].name, LOOKUP[alliance].name];
+        loserShipCount = LOOKUP[alliance].ships.filter((ship) => ship.hp === 0).length;
     } else if (computerShipsDestroyed === LOOKUP[enemyAlliance].ships.length) {
-        winner = 'Player Wins'
+        [winner, loser] = [LOOKUP[alliance].name, LOOKUP[enemyAlliance].name];
+        loserShipCount = LOOKUP[enemyAlliance].ships.filter((ship) => ship.hp === 0).length;
     }
     if (winner) {
-        endGame(winner);
+        endGame([winner, loser, loserShipCount]);
     }
 }
 
-function endGame(winner) {
+function endGame(arr) {
     computerBoardEl.style.display = 'none';
     shipDock.style.display = 'none';
     instructions.style.display = 'none';
@@ -411,11 +416,30 @@ function endGame(winner) {
     game = 2;
     renderButtons();
     stopMusic();
-    renderEndGameModal(winner);
+    renderEndGameModal(arr);
 }
 
-function renderEndGameModal(winner) {
-    endGameModal.style.display = 'flex'
+function renderEndGameModal(arr) {
+    const [winName, loseName, loserShipCount] = arr;
+    let computerAttempts = 0;
+    let playerAttempts = 0;
+    playerBoard.forEach(row => {
+        computerAttempts += row.filter(elVal => elVal !== 0).length
+    });
+    computerBoard.forEach(row => {
+        playerAttempts += row.filter(elVal => elVal !== 0).length
+    });
+    const winAttempts = winName === LOOKUP[alliance].name ? playerAttempts : computerAttempts;
+    crawlTitle.innerText = `${winName} Wins`;
+    winnerName.forEach(el => {
+        el.innerText = winName;
+    })
+    loserName.forEach(el => {
+        el.innerText = loseName;
+    })
+    losingShipCount[0].innerText = loserShipCount;
+    crawlParagraph.innerText = `While the ${winName} might have been victorious this time, it still took them ${winAttempts} attempts to destroy the ${loseName}'s Fleet.`;
+    endGameModal.style.display = 'flex';
 }
 
 function checkIfSurrounded(rowIdx, colIdx) {
@@ -441,7 +465,6 @@ function clearLastMisses() {
 }
 
 function getLastHit() {
-    console.log(computerTurnLog)
     return computerTurnLog.reduceRight((result, currentArray) => {
         if (!result && currentArray.includes('hit')) {
             return currentArray;
@@ -691,7 +714,6 @@ function getShipLength(e) {
 
 function handleArrayPlacement(obj) {
     const { matchingCells, shipName } = obj;
-    console.log(matchingCells);
     matchingCells.forEach((cell) => {
         const [row, col] = cell.id.split('-');
         playerBoard[row - 1][col - 1] = shipName;
