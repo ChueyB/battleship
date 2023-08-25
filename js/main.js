@@ -11,26 +11,31 @@ const LOOKUP = {
                 name: 'Bellator Dreadnaught',
                 img: 'assets/images/galactic_empire/bellatorDreadnaught.png',
                 hp: 3,
+                damageTaken: 0,
             },
             {
                 name: 'CR 90',
                 img: 'assets/images/galactic_empire/cr90.png',
                 hp: 3,
+                damageTaken: 0,
             },
             {
                 name: 'Imperial Freighter',
                 img: 'assets/images/galactic_empire/imperialFreighter.png',
                 hp: 3,
+                damageTaken: 0,
             },
             {
                 name: 'Dreadnaught Cruiser',
                 img: 'assets/images/galactic_empire/dreadnaughtCruiser.png',
                 hp: 6,
+                damageTaken: 0,
             },
             {
                 name: 'Tie Fighter',
                 img: 'assets/images/galactic_empire/tieFighter.png',
                 hp: 1,
+                damageTaken: 0,
             },
         ],
     },
@@ -45,36 +50,43 @@ const LOOKUP = {
                 name: 'X Wing',
                 img: 'assets/images/rebel_alliance/xWing.png',
                 hp: 1,
+                damageTaken: 0,
             },
             {
                 name: 'Y Wing',
                 img: 'assets/images/rebel_alliance/yWing.png',
                 hp: 2,
+                damageTaken: 0,
             },
             {
                 name: 'B Wing',
                 img: 'assets/images/rebel_alliance/bWing.png',
                 hp: 2,
+                damageTaken: 0,
             },
             {
                 name: 'H6 Bomber',
                 img: 'assets/images/rebel_alliance/h6Bomber.png',
                 hp: 2,
+                damageTaken: 0,
             },
             {
                 name: 'GR Transport',
                 img: 'assets/images/rebel_alliance/grTransport.png',
                 hp: 3,
+                damageTaken: 0,
             },
             {
                 name: 'Hammerhead Corvette',
                 img: 'assets/images/rebel_alliance/hammerheadCorvette.png',
                 hp: 4,
+                damageTaken: 0,
             },
             {
                 name: 'A Wing',
                 img: 'assets/images/rebel_alliance/aWing.png',
                 hp: 1,
+                damageTaken: 0,
             },
         ],
     },
@@ -83,6 +95,7 @@ const LOOKUP = {
             name: 'Deathstar',
             img: 'assets/images/galactic_empire/deathstar.png',
             hp: 100,
+            damageTaken: 0,
         },
     },
 };
@@ -224,6 +237,7 @@ function handleRestartGame(g) {
 
     game = 0;
     computerTurnLog.length = 0;
+    resetDamageTaken();
     stopMusic();
     init();
 }
@@ -286,6 +300,8 @@ function handleAllianceChoice(e) {
 
     alliance = e.target.id;
     enemyAlliance = getEnemyAlliance(alliance);
+    enemyShipArray = LOOKUP[enemyAlliance].ships;
+    playerShipArray = LOOKUP[alliance].ships;
     modal.style.display = 'none';
     playerBoardEl.style.display = 'grid';
     titleSection.style.display = 'grid';
@@ -375,7 +391,7 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
     const nameOfShip = turn === 'Player' ? computerBoard[rowIdx][colIdx] : playerBoard[rowIdx][colIdx];
     const currentEnemyAlliance = turn === 'Player' ? enemyAlliance : alliance;
     const currentCells = turn === 'Player' ? computerCells : playerCells;
-    const shipInLookup = LOOKUP[currentEnemyAlliance].ships.find(
+    const currentEnemyShip = LOOKUP[currentEnemyAlliance].ships.find(
         (ship) => ship.name === nameOfShip
     );
 
@@ -398,7 +414,7 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
     }
 
     if (!nameOfShip) return;
-    shipInLookup.hp -= 1;
+    currentEnemyShip.damageTaken += 1;
     updateScores();
 }
 
@@ -541,6 +557,7 @@ function endGame(arr) {
     titleSection.style.display = 'none';
 
     game = 2;
+    resetDamageTaken();
     renderButtons();
     stopMusic();
     renderEndGameModal(arr);
@@ -751,7 +768,7 @@ function getEnemyAlliance(ally) {
 }
 
 function getDestroyedShipCount(allianceVar) {
-    return LOOKUP[allianceVar].ships.filter((ship) => ship.hp === 0).length;
+    return LOOKUP[allianceVar].ships.filter((ship) => ship.damageTaken === ship.hp).length;
 }
 
 function checkIfSurrounded(rowIdx, colIdx) {
@@ -760,4 +777,12 @@ function checkIfSurrounded(rowIdx, colIdx) {
         const el = playerBoard[rowIdx + arr[0]][colIdx + arr[1]];
         return el === HIT || el === MISS;
     })
+}
+
+function resetDamageTaken() {
+    [LOOKUP[alliance].ships, LOOKUP[enemyAlliance].ships].forEach(shipsArray => {
+        shipsArray.forEach(ship => {
+            ship.damageTaken = 0;
+        });
+    });
 }
