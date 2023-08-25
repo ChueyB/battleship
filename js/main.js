@@ -371,69 +371,6 @@ function handleGuessNextCell(rowIdx, colIdx) {
     checkWinner()
 }
 
-function checkWinner() {
-    const playerShipsDestroyed = getDestroyedShipCount(alliance)
-    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance)
-    let loserShipCount;
-    if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
-        [winner, loser] = [LOOKUP[enemyAlliance].name, LOOKUP[alliance].name];
-        loserShipCount = LOOKUP[alliance].ships.filter((ship) => ship.hp === 0).length;
-    } else if (computerShipsDestroyed === LOOKUP[enemyAlliance].ships.length) {
-        [winner, loser] = [LOOKUP[alliance].name, LOOKUP[enemyAlliance].name];
-        loserShipCount = LOOKUP[enemyAlliance].ships.filter((ship) => ship.hp === 0).length;
-    }
-    if (winner) {
-        endGame([winner, loser, loserShipCount]);
-    }
-}
-
-function endGame(arr) {
-    computerBoardEl.style.display = 'none';
-    shipDock.style.display = 'none';
-    instructions.style.display = 'none';
-    scoresEl.style.display = 'none';
-    modal.style.display = 'none';
-    playerBoardEl.style.display = 'none';
-    shipDockIMGEls.innerHTML = '';
-    titleSection.style.display = 'none';
-
-    game = 2;
-    renderButtons();
-    stopMusic();
-    renderEndGameModal(arr);
-}
-
-function renderEndGameModal(arr) {
-    const [winName, loseName, loserShipCount] = arr;
-    let computerAttempts = 0;
-    let playerAttempts = 0;
-    playerBoard.forEach(row => {
-        computerAttempts += row.filter(elVal => elVal !== 0).length
-    });
-    computerBoard.forEach(row => {
-        playerAttempts += row.filter(elVal => elVal !== 0).length
-    });
-    const winAttempts = winName === LOOKUP[alliance].name ? playerAttempts : computerAttempts;
-    crawlTitle.innerText = `${winName} Wins`;
-    winnerName.forEach(el => {
-        el.innerText = winName;
-    })
-    loserName.forEach(el => {
-        el.innerText = loseName;
-    })
-    losingShipCount[0].innerText = loserShipCount;
-    crawlParagraph.innerText = `While the ${winName} might have been victorious this time, it still took them ${winAttempts} attempts to destroy the ${loseName}'s Fleet.`;
-    endGameModal.style.display = 'flex';
-}
-
-function checkIfSurrounded(rowIdx, colIdx) {
-    return DIRECTIONS.every(arr => {
-        if (!isValidPosition(rowIdx + arr[0], colIdx + arr[1])) return true;
-        const el = playerBoard[rowIdx + arr[0]][colIdx + arr[1]];
-        return el === HIT || el === MISS;
-    })
-}
-
 function handleHits(rowIdx, colIdx, hitOrMiss) {
     const nameOfShip = turn === 'Player' ? computerBoard[rowIdx][colIdx] : playerBoard[rowIdx][colIdx];
     const currentEnemyAlliance = turn === 'Player' ? enemyAlliance : alliance;
@@ -574,6 +511,62 @@ function handleResetPlacement() {
 
     renderPlayerBoard();
     renderShipDock();
+}
+
+// All endgame functions
+function checkWinner() {
+    const playerShipsDestroyed = getDestroyedShipCount(alliance)
+    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance)
+    let loserShipCount;
+    if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
+        [winner, loser] = [LOOKUP[enemyAlliance].name, LOOKUP[alliance].name];
+        loserShipCount = LOOKUP[alliance].ships.filter((ship) => ship.hp === 0).length;
+    } else if (computerShipsDestroyed === LOOKUP[enemyAlliance].ships.length) {
+        [winner, loser] = [LOOKUP[alliance].name, LOOKUP[enemyAlliance].name];
+        loserShipCount = LOOKUP[enemyAlliance].ships.filter((ship) => ship.hp === 0).length;
+    }
+    if (winner) {
+        endGame([winner, loser, loserShipCount]);
+    }
+}
+
+function endGame(arr) {
+    computerBoardEl.style.display = 'none';
+    shipDock.style.display = 'none';
+    instructions.style.display = 'none';
+    scoresEl.style.display = 'none';
+    modal.style.display = 'none';
+    playerBoardEl.style.display = 'none';
+    shipDockIMGEls.innerHTML = '';
+    titleSection.style.display = 'none';
+
+    game = 2;
+    renderButtons();
+    stopMusic();
+    renderEndGameModal(arr);
+}
+
+function renderEndGameModal(arr) {
+    const [winName, loseName, loserShipCount] = arr;
+    let computerAttempts = 0;
+    let playerAttempts = 0;
+    playerBoard.forEach(row => {
+        computerAttempts += row.filter(elVal => elVal !== 0).length
+    });
+    computerBoard.forEach(row => {
+        playerAttempts += row.filter(elVal => elVal !== 0).length
+    });
+    const winAttempts = winName === LOOKUP[alliance].name ? playerAttempts : computerAttempts;
+    crawlTitle.innerText = `${winName} Wins`;
+    winnerName.forEach(el => {
+        el.innerText = winName;
+    })
+    loserName.forEach(el => {
+        el.innerText = loseName;
+    })
+    losingShipCount[0].innerText = loserShipCount;
+    crawlParagraph.innerText = `While the ${winName} might have been victorious this time, it still took them ${winAttempts} attempts to destroy the ${loseName}'s Fleet.`;
+    endGameModal.style.display = 'flex';
 }
 
 // Properly place the image into the grid
@@ -759,4 +752,12 @@ function getEnemyAlliance(ally) {
 
 function getDestroyedShipCount(allianceVar) {
     return LOOKUP[allianceVar].ships.filter((ship) => ship.hp === 0).length;
+}
+
+function checkIfSurrounded(rowIdx, colIdx) {
+    return DIRECTIONS.every(arr => {
+        if (!isValidPosition(rowIdx + arr[0], colIdx + arr[1])) return true;
+        const el = playerBoard[rowIdx + arr[0]][colIdx + arr[1]];
+        return el === HIT || el === MISS;
+    })
 }
