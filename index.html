@@ -1,292 +1,295 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Battle Starship</title>
-        <link
-            rel="icon"
-            type="image/x-icon"
-            href="https://github.com/ChueyB/battleship/blob/main/assets/favicon.png?raw=true"
-        />
-        <link
-            href="https://fonts.cdnfonts.com/css/star-wars"
-            rel="stylesheet"
-        />
-        <script defer src="js/main.js"></script>
-        <link rel="stylesheet" href="styles/main.css" />
-    </head>
-    <body>
-        <div class="space"></div>
-        <div class="stars"></div>
-        <div id="modal">
-            <div class="modal-content">
-                <h1>choose your alliance</h1>
-                <img
-                    src="assets/images/galactic_empire/galactic_empire.jpg"
-                    alt="Galactic Empire"
-                    srcset=""
-                    class="alliance"
-                    id="galacticEmpire"
-                />
-                <img
-                    src="assets//images/rebel_alliance/rebel_alliance.gif"
-                    alt="Rebel Allilance"
-                    srcset=""
-                    class="alliance"
-                    id="rebelAlliance"
-                />
-            </div>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Battle Starship</title>
+    <link rel="icon" type="image/x-icon"
+        href="https://github.com/ChueyB/battleship/blob/main/assets/favicon.png?raw=true" />
+    <link href="https://fonts.cdnfonts.com/css/star-wars" rel="stylesheet" />
+    <script defer src="js/main.js"></script>
+    <link rel="stylesheet" href="styles/main.css" />
+</head>
+
+<body>
+    <div class="space"></div>
+    <div class="stars"></div>
+    <div id="modal">
+        <div class="modal-content">
+            <h1>choose your alliance</h1>
+            <img src="assets/images/galactic_empire/galactic_empire.jpg" alt="Galactic Empire" srcset=""
+                class="alliance" id="galacticEmpire" />
+            <img src="assets//images/rebel_alliance/rebel_alliance.gif" alt="Rebel Allilance" srcset="" class="alliance"
+                id="rebelAlliance" />
         </div>
-        <section id="game">
-            <section id="title">
-                <h1>battle starship</h1>
-                <h3 id="message">
-                    Its A PLACEHOLDER!!!
-                </h3>
+    </div>
+    <section id="game">
+        <section id="title">
+            <h1>battle starship</h1>
+            <h3 id="message">
+                Its A PLACEHOLDER!!!
+            </h3>
+        </section>
+        <section id="boards">
+            <main id="computer-board">
+                <div id="1-1"></div>
+                <div id="1-2"></div>
+                <div id="1-3"></div>
+                <div id="1-4"></div>
+                <div id="1-5"></div>
+                <div id="1-6"></div>
+                <div id="1-7"></div>
+                <div id="1-8"></div>
+                <div id="1-9"></div>
+                <div id="1-10"></div>
+                <div id="2-1"></div>
+                <div id="2-2"></div>
+                <div id="2-3"></div>
+                <div id="2-4"></div>
+                <div id="2-5"></div>
+                <div id="2-6"></div>
+                <div id="2-7"></div>
+                <div id="2-8"></div>
+                <div id="2-9"></div>
+                <div id="2-10"></div>
+                <div id="3-1"></div>
+                <div id="3-2"></div>
+                <div id="3-3"></div>
+                <div id="3-4"></div>
+                <div id="3-5"></div>
+                <div id="3-6"></div>
+                <div id="3-7"></div>
+                <div id="3-8"></div>
+                <div id="3-9"></div>
+                <div id="3-10"></div>
+                <div id="4-1"></div>
+                <div id="4-2"></div>
+                <div id="4-3"></div>
+                <div id="4-4"></div>
+                <div id="4-5"></div>
+                <div id="4-6"></div>
+                <div id="4-7"></div>
+                <div id="4-8"></div>
+                <div id="4-9"></div>
+                <div id="4-10"></div>
+                <div id="5-1"></div>
+                <div id="5-2"></div>
+                <div id="5-3"></div>
+                <div id="5-4"></div>
+                <div id="5-5"></div>
+                <div id="5-6"></div>
+                <div id="5-7"></div>
+                <div id="5-8"></div>
+                <div id="5-9"></div>
+                <div id="5-10"></div>
+                <div id="6-1"></div>
+                <div id="6-2"></div>
+                <div id="6-3"></div>
+                <div id="6-4"></div>
+                <div id="6-5"></div>
+                <div id="6-6"></div>
+                <div id="6-7"></div>
+                <div id="6-8"></div>
+                <div id="6-9"></div>
+                <div id="6-10"></div>
+                <div id="7-1"></div>
+                <div id="7-2"></div>
+                <div id="7-3"></div>
+                <div id="7-4"></div>
+                <div id="7-5"></div>
+                <div id="7-6"></div>
+                <div id="7-7"></div>
+                <div id="7-8"></div>
+                <div id="7-9"></div>
+                <div id="7-10"></div>
+                <div id="8-1"></div>
+                <div id="8-2"></div>
+                <div id="8-3"></div>
+                <div id="8-4"></div>
+                <div id="8-5"></div>
+                <div id="8-6"></div>
+                <div id="8-7"></div>
+                <div id="8-8"></div>
+                <div id="8-9"></div>
+                <div id="8-10"></div>
+                <div id="9-1"></div>
+                <div id="9-2"></div>
+                <div id="9-3"></div>
+                <div id="9-4"></div>
+                <div id="9-5"></div>
+                <div id="9-6"></div>
+                <div id="9-7"></div>
+                <div id="9-8"></div>
+                <div id="9-9"></div>
+                <div id="9-10"></div>
+                <div id="10-1"></div>
+                <div id="10-2"></div>
+                <div id="10-3"></div>
+                <div id="10-4"></div>
+                <div id="10-5"></div>
+                <div id="10-6"></div>
+                <div id="10-7"></div>
+                <div id="10-8"></div>
+                <div id="10-9"></div>
+                <div id="10-10"></div>
+            </main>
+            <section id="scores">
+                <aside id="computerScore"></aside>
+                <aside id="playerScore"></aside>
             </section>
-            <section id="boards">
-                <main id="computer-board">
-                    <div id="1-1"></div>
-                    <div id="1-2"></div>
-                    <div id="1-3"></div>
-                    <div id="1-4"></div>
-                    <div id="1-5"></div>
-                    <div id="1-6"></div>
-                    <div id="1-7"></div>
-                    <div id="1-8"></div>
-                    <div id="1-9"></div>
-                    <div id="1-10"></div>
-                    <div id="2-1"></div>
-                    <div id="2-2"></div>
-                    <div id="2-3"></div>
-                    <div id="2-4"></div>
-                    <div id="2-5"></div>
-                    <div id="2-6"></div>
-                    <div id="2-7"></div>
-                    <div id="2-8"></div>
-                    <div id="2-9"></div>
-                    <div id="2-10"></div>
-                    <div id="3-1"></div>
-                    <div id="3-2"></div>
-                    <div id="3-3"></div>
-                    <div id="3-4"></div>
-                    <div id="3-5"></div>
-                    <div id="3-6"></div>
-                    <div id="3-7"></div>
-                    <div id="3-8"></div>
-                    <div id="3-9"></div>
-                    <div id="3-10"></div>
-                    <div id="4-1"></div>
-                    <div id="4-2"></div>
-                    <div id="4-3"></div>
-                    <div id="4-4"></div>
-                    <div id="4-5"></div>
-                    <div id="4-6"></div>
-                    <div id="4-7"></div>
-                    <div id="4-8"></div>
-                    <div id="4-9"></div>
-                    <div id="4-10"></div>
-                    <div id="5-1"></div>
-                    <div id="5-2"></div>
-                    <div id="5-3"></div>
-                    <div id="5-4"></div>
-                    <div id="5-5"></div>
-                    <div id="5-6"></div>
-                    <div id="5-7"></div>
-                    <div id="5-8"></div>
-                    <div id="5-9"></div>
-                    <div id="5-10"></div>
-                    <div id="6-1"></div>
-                    <div id="6-2"></div>
-                    <div id="6-3"></div>
-                    <div id="6-4"></div>
-                    <div id="6-5"></div>
-                    <div id="6-6"></div>
-                    <div id="6-7"></div>
-                    <div id="6-8"></div>
-                    <div id="6-9"></div>
-                    <div id="6-10"></div>
-                    <div id="7-1"></div>
-                    <div id="7-2"></div>
-                    <div id="7-3"></div>
-                    <div id="7-4"></div>
-                    <div id="7-5"></div>
-                    <div id="7-6"></div>
-                    <div id="7-7"></div>
-                    <div id="7-8"></div>
-                    <div id="7-9"></div>
-                    <div id="7-10"></div>
-                    <div id="8-1"></div>
-                    <div id="8-2"></div>
-                    <div id="8-3"></div>
-                    <div id="8-4"></div>
-                    <div id="8-5"></div>
-                    <div id="8-6"></div>
-                    <div id="8-7"></div>
-                    <div id="8-8"></div>
-                    <div id="8-9"></div>
-                    <div id="8-10"></div>
-                    <div id="9-1"></div>
-                    <div id="9-2"></div>
-                    <div id="9-3"></div>
-                    <div id="9-4"></div>
-                    <div id="9-5"></div>
-                    <div id="9-6"></div>
-                    <div id="9-7"></div>
-                    <div id="9-8"></div>
-                    <div id="9-9"></div>
-                    <div id="9-10"></div>
-                    <div id="10-1"></div>
-                    <div id="10-2"></div>
-                    <div id="10-3"></div>
-                    <div id="10-4"></div>
-                    <div id="10-5"></div>
-                    <div id="10-6"></div>
-                    <div id="10-7"></div>
-                    <div id="10-8"></div>
-                    <div id="10-9"></div>
-                    <div id="10-10"></div>
-                </main>
-                <section id="scores">
-                    <aside id="computerScore"></aside>
-                    <aside id="playerScore"></aside>
+            <section id="ship-dock">
+                <section id="buttons-container">
+                    <button id="rotate-ship">Rotate Ship</button>
+                    <button id="reset-placement">Reset Board</button>
                 </section>
-                <section id="ship-dock">
-                    <section id="buttons-container">
-                        <button id="rotate-ship">Rotate Ship</button>
-                        <button id="reset-placement">Reset Board</button>
-                    </section>
-                    <p id="ship-name">Placeholder</p>
-                    <section id="all-ships"></section>
-                </section>
-                <main id="player-board">
-                    <div id="1-1"></div>
-                    <div id="1-2"></div>
-                    <div id="1-3"></div>
-                    <div id="1-4"></div>
-                    <div id="1-5"></div>
-                    <div id="1-6"></div>
-                    <div id="1-7"></div>
-                    <div id="1-8"></div>
-                    <div id="1-9"></div>
-                    <div id="1-10"></div>
-                    <div id="2-1"></div>
-                    <div id="2-2"></div>
-                    <div id="2-3"></div>
-                    <div id="2-4"></div>
-                    <div id="2-5"></div>
-                    <div id="2-6"></div>
-                    <div id="2-7"></div>
-                    <div id="2-8"></div>
-                    <div id="2-9"></div>
-                    <div id="2-10"></div>
-                    <div id="3-1"></div>
-                    <div id="3-2"></div>
-                    <div id="3-3"></div>
-                    <div id="3-4"></div>
-                    <div id="3-5"></div>
-                    <div id="3-6"></div>
-                    <div id="3-7"></div>
-                    <div id="3-8"></div>
-                    <div id="3-9"></div>
-                    <div id="3-10"></div>
-                    <div id="4-1"></div>
-                    <div id="4-2"></div>
-                    <div id="4-3"></div>
-                    <div id="4-4"></div>
-                    <div id="4-5"></div>
-                    <div id="4-6"></div>
-                    <div id="4-7"></div>
-                    <div id="4-8"></div>
-                    <div id="4-9"></div>
-                    <div id="4-10"></div>
-                    <div id="5-1"></div>
-                    <div id="5-2"></div>
-                    <div id="5-3"></div>
-                    <div id="5-4"></div>
-                    <div id="5-5"></div>
-                    <div id="5-6"></div>
-                    <div id="5-7"></div>
-                    <div id="5-8"></div>
-                    <div id="5-9"></div>
-                    <div id="5-10"></div>
-                    <div id="6-1"></div>
-                    <div id="6-2"></div>
-                    <div id="6-3"></div>
-                    <div id="6-4"></div>
-                    <div id="6-5"></div>
-                    <div id="6-6"></div>
-                    <div id="6-7"></div>
-                    <div id="6-8"></div>
-                    <div id="6-9"></div>
-                    <div id="6-10"></div>
-                    <div id="7-1"></div>
-                    <div id="7-2"></div>
-                    <div id="7-3"></div>
-                    <div id="7-4"></div>
-                    <div id="7-5"></div>
-                    <div id="7-6"></div>
-                    <div id="7-7"></div>
-                    <div id="7-8"></div>
-                    <div id="7-9"></div>
-                    <div id="7-10"></div>
-                    <div id="8-1"></div>
-                    <div id="8-2"></div>
-                    <div id="8-3"></div>
-                    <div id="8-4"></div>
-                    <div id="8-5"></div>
-                    <div id="8-6"></div>
-                    <div id="8-7"></div>
-                    <div id="8-8"></div>
-                    <div id="8-9"></div>
-                    <div id="8-10"></div>
-                    <div id="9-1"></div>
-                    <div id="9-2"></div>
-                    <div id="9-3"></div>
-                    <div id="9-4"></div>
-                    <div id="9-5"></div>
-                    <div id="9-6"></div>
-                    <div id="9-7"></div>
-                    <div id="9-8"></div>
-                    <div id="9-9"></div>
-                    <div id="9-10"></div>
-                    <div id="10-1"></div>
-                    <div id="10-2"></div>
-                    <div id="10-3"></div>
-                    <div id="10-4"></div>
-                    <div id="10-5"></div>
-                    <div id="10-6"></div>
-                    <div id="10-7"></div>
-                    <div id="10-8"></div>
-                    <div id="10-9"></div>
-                    <div id="10-10"></div>
-                </main>
-                <section id="instructions-container">
-                    <h3 id="instruction-header">INSTRUCTIONS</h3>
-                    <p id="instructions">
-                        <ol>
-                            <li>Place your ships on the board. (Once placed you can't unplace them)</li>
-                            <li>You can rotate the ship using the Rotate Ship button</li>
-                            <li>If you mess up your placement or just want to start over, press the Reset Board button</li>
-                            <li>Once you're done, press the Play button.</li>
-                            <li>You will always start first when the game begins.</li>
-                            <li>The computer will always be the opposite alliance as you.</li>
-                            <li>The game ends when either side has destroyed their enemies ships.</li>
-                        </ol>
-                    </p>
-                </section>
+                <p id="ship-name">Placeholder</p>
+                <section id="all-ships"></section>
             </section>
-            <section id="controls">
-                <button id="play-btn">PLAY</button>
-                <button id="restart-btn">RESTART</button>
+            <main id="player-board">
+                <div id="1-1"></div>
+                <div id="1-2"></div>
+                <div id="1-3"></div>
+                <div id="1-4"></div>
+                <div id="1-5"></div>
+                <div id="1-6"></div>
+                <div id="1-7"></div>
+                <div id="1-8"></div>
+                <div id="1-9"></div>
+                <div id="1-10"></div>
+                <div id="2-1"></div>
+                <div id="2-2"></div>
+                <div id="2-3"></div>
+                <div id="2-4"></div>
+                <div id="2-5"></div>
+                <div id="2-6"></div>
+                <div id="2-7"></div>
+                <div id="2-8"></div>
+                <div id="2-9"></div>
+                <div id="2-10"></div>
+                <div id="3-1"></div>
+                <div id="3-2"></div>
+                <div id="3-3"></div>
+                <div id="3-4"></div>
+                <div id="3-5"></div>
+                <div id="3-6"></div>
+                <div id="3-7"></div>
+                <div id="3-8"></div>
+                <div id="3-9"></div>
+                <div id="3-10"></div>
+                <div id="4-1"></div>
+                <div id="4-2"></div>
+                <div id="4-3"></div>
+                <div id="4-4"></div>
+                <div id="4-5"></div>
+                <div id="4-6"></div>
+                <div id="4-7"></div>
+                <div id="4-8"></div>
+                <div id="4-9"></div>
+                <div id="4-10"></div>
+                <div id="5-1"></div>
+                <div id="5-2"></div>
+                <div id="5-3"></div>
+                <div id="5-4"></div>
+                <div id="5-5"></div>
+                <div id="5-6"></div>
+                <div id="5-7"></div>
+                <div id="5-8"></div>
+                <div id="5-9"></div>
+                <div id="5-10"></div>
+                <div id="6-1"></div>
+                <div id="6-2"></div>
+                <div id="6-3"></div>
+                <div id="6-4"></div>
+                <div id="6-5"></div>
+                <div id="6-6"></div>
+                <div id="6-7"></div>
+                <div id="6-8"></div>
+                <div id="6-9"></div>
+                <div id="6-10"></div>
+                <div id="7-1"></div>
+                <div id="7-2"></div>
+                <div id="7-3"></div>
+                <div id="7-4"></div>
+                <div id="7-5"></div>
+                <div id="7-6"></div>
+                <div id="7-7"></div>
+                <div id="7-8"></div>
+                <div id="7-9"></div>
+                <div id="7-10"></div>
+                <div id="8-1"></div>
+                <div id="8-2"></div>
+                <div id="8-3"></div>
+                <div id="8-4"></div>
+                <div id="8-5"></div>
+                <div id="8-6"></div>
+                <div id="8-7"></div>
+                <div id="8-8"></div>
+                <div id="8-9"></div>
+                <div id="8-10"></div>
+                <div id="9-1"></div>
+                <div id="9-2"></div>
+                <div id="9-3"></div>
+                <div id="9-4"></div>
+                <div id="9-5"></div>
+                <div id="9-6"></div>
+                <div id="9-7"></div>
+                <div id="9-8"></div>
+                <div id="9-9"></div>
+                <div id="9-10"></div>
+                <div id="10-1"></div>
+                <div id="10-2"></div>
+                <div id="10-3"></div>
+                <div id="10-4"></div>
+                <div id="10-5"></div>
+                <div id="10-6"></div>
+                <div id="10-7"></div>
+                <div id="10-8"></div>
+                <div id="10-9"></div>
+                <div id="10-10"></div>
+            </main>
+            <section id="instructions-container">
+                <h3 id="instruction-header">INSTRUCTIONS</h3>
+                <p id="instructions">
+                <ol>
+                    <li>Place your ships on the board. (Once placed you can't unplace them)</li>
+                    <li>You can rotate the ship using the Rotate Ship button</li>
+                    <li>If you mess up your placement or just want to start over, press the Reset Board button</li>
+                    <li>Once you're done, press the Play button.</li>
+                    <li>You will always start first when the game begins.</li>
+                    <li>The computer will always be the opposite alliance as you.</li>
+                    <li>The game ends when either side has destroyed their enemies ships.</li>
+                </ol>
+                </p>
             </section>
         </section>
-        <div id="endgame-modal">
-            <div class="modal-content">
-                <h1 id="gameover-message">GAME OVER YOU LOSE</h1>
-                <button id="play-again">Play Again</button>
+        <section id="controls">
+            <button id="play-btn">PLAY</button>
+            <button id="restart-btn">RESTART</button>
+        </section>
+    </section>
+    <div class="fade"></div>
+
+    <section class="star-wars" id="endgame-modal">
+
+        <div class="crawl">
+
+            <div class="title">
+                <p>Episode I</p>
+                <h2 id="crawl-title">YOU LOSE</h2>
             </div>
+
+            <p>It is a period of civil war. The <span class="winning-alliance-name">Galactic Empire</span> has won their
+                recent battle against the
+                <span class="losing-alliance-name">Rebel Alliance</span>
+            </p>
+            <p>During the battle, the <span class="winning-alliance-name"></span> shot down <span
+                    class="losing-alliance-ships"></span> ships.</p>
+            <p id="crawl-paragraph"></p>
+
         </div>
-    </body>
+        <button id="play-again">Play Again</button>
+    </section>
+</body>
+
 </html>

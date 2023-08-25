@@ -1,6 +1,6 @@
 <div id="header" align="center">
 
-  <img src="assets/battleship_logo.jpg" width="800" height="400" alt="battleship game logo">
+  <img src="assets/battleship_logo.jpg" width="800" alt="battleship game logo"  style="max-height: 200px; object-fit: cover;">
 
 </div>
 

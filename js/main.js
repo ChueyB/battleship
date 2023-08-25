@@ -104,11 +104,13 @@ let computerBoard;
 let dragged;
 let rotated;
 let turn;
-let lastComputerHits;
+let computerTurnLog;
 
 /*----- cached elements  -----*/
 const modal = document.getElementById('modal');
+const endGameModal = document.getElementById('endgame-modal')
 const message = document.getElementById('message')
+const gameOverMessage = document.getElementById('gameover-message')
 const playerCells = [...document.querySelectorAll('#player-board > div')];
 const computerCells = [...document.querySelectorAll('#computer-board > div')];
 const shipDockIMGEls = document.querySelector('#all-ships');
@@ -120,19 +122,16 @@ const computerBoardEl = document.querySelector('#computer-board');
 const shipName = document.getElementById('ship-name');
 const playBtn = document.getElementById('play-btn');
 const restartBtn = document.getElementById('restart-btn');
+const playAgainBtn = document.getElementById('play-again')
+const titleSection = document.getElementById('title')
 
 /*----- event listeners -----*/
 playBtn.addEventListener('click', handlePlay);
 restartBtn.addEventListener('click', handleRestartGame);
-document
-    .querySelector('.modal-content')
-    .addEventListener('click', handleAllianceChoice);
-document
-    .getElementById('rotate-ship')
-    .addEventListener('click', handleButtonRotate);
-document
-    .getElementById('reset-placement')
-    .addEventListener('click', handleResetPlacement);
+playAgainBtn.addEventListener('click', handleRestartGame)
+document.querySelector('.modal-content').addEventListener('click', handleAllianceChoice);
+document.getElementById('rotate-ship').addEventListener('click', handleButtonRotate);
+document.getElementById('reset-placement').addEventListener('click', handleResetPlacement);
 shipDockIMGEls.addEventListener('dragstart', handleDragStart);
 playerBoardEl.addEventListener('dragover', handleDragOver);
 playerBoardEl.addEventListener('drop', handleDrop);
@@ -150,7 +149,7 @@ function init() {
     game = false;
     dragged = null;
     rotated = false;
-    lastComputerHits = [[0, 0, 0]];
+    computerTurnLog = [[0, 0, 0]];
     playerBoard = [];
     computerBoard = [];
     turn = 'Player';
@@ -202,22 +201,25 @@ function handlePlay() {
     playMusic();
 }
 
-function handleRestartGame() {
+function handleRestartGame(g) {
     computerBoardEl.style.display = 'none';
     shipDock.style.display = 'grid';
     instructions.style.display = 'flex';
     playerBoardEl.style.gridColumn = '2 / 4';
     scoresEl.style.display = 'none';
+    endGameModal.style.display = 'none';
 
     game = 0;
-    lastComputerHits.length = 0;
-    renderModal()
+    computerTurnLog.length = 0;
     stopMusic();
     init();
 }
 
 function renderButtons() {
-    if (game) {
+    if (game === 2) {
+        playBtn.style.display = 'none';
+        restartBtn.style.display = 'none';
+    } else if (game === 1) {
         playBtn.style.display = 'none';
         restartBtn.style.display = 'grid';
     } else {
@@ -226,17 +228,31 @@ function renderButtons() {
     }
 }
 
-function renderScores(ally) {
+function renderScores(ally, totalPlayerShips, totalComputerShips) {
     scoresEl.style.display = 'grid';
-    scoresEl.children[0].style.backgroundColor =
-        LOOKUP[enemyAlliance].colors.hit;
+    scoresEl.children[0].style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
     scoresEl.children[1].style.backgroundColor = LOOKUP[ally].colors.hit;
 
     if (!game) return;
 
-    scoresEl.firstElementChild.innerText = score[0];
-    scoresEl.lastElementChild.innerText = score[1];
+    scoresEl.firstElementChild.innerText = `${score[0]} / ${totalComputerShips}`;
+    scoresEl.lastElementChild.innerText = `${score[1]} / ${totalPlayerShips}`;
 }
+
+function updateScores() {
+    const playerShipsDestroyed = LOOKUP[alliance].ships.filter(
+        (ship) => ship.hp === 0
+    ).length;
+    const totalPlayerShips = LOOKUP[alliance].ships.length;
+    const computerShipsDestroyed = LOOKUP[enemyAlliance].ships.filter(
+        (ship) => ship.hp === 0
+    ).length;
+    const totalComputerShips = LOOKUP[enemyAlliance].ships.length;
+    score[1] = playerShipsDestroyed;
+    score[0] = computerShipsDestroyed;
+    renderScores(alliance, totalPlayerShips, totalComputerShips);
+}
+
 
 function getEnemyAlliance(ally) {
     const enemyAlliance = Object.keys(LOOKUP).filter(
@@ -246,7 +262,6 @@ function getEnemyAlliance(ally) {
     return enemyAlliance;
 }
 
-// Handles the modal choice prior to starting the game
 function renderModal() {
     modal.style.display = 'flex';
     playerBoardEl.style.display = 'none';
@@ -254,6 +269,7 @@ function renderModal() {
     handleResetPlacement();
 }
 
+// Handles alliance choice at the start of game
 function handleAllianceChoice(e) {
     if (e.target.tagName !== 'IMG') return;
 
@@ -261,6 +277,8 @@ function handleAllianceChoice(e) {
     enemyAlliance = getEnemyAlliance(alliance);
     modal.style.display = 'none';
     playerBoardEl.style.display = 'grid';
+    titleSection.style.display = 'grid';
+    game = 0;
     renderShipDock();
     renderButtons();
     setComputerShips();
@@ -268,6 +286,7 @@ function handleAllianceChoice(e) {
 }
 
 function renderMessage(ally, hitOrMiss) {
+
     if (!game) {
         message.innerHTML = `Welcome to the <span style="color:${LOOKUP[alliance].colors.hit};">${LOOKUP[alliance].name}</span>`
     } else {
@@ -275,7 +294,6 @@ function renderMessage(ally, hitOrMiss) {
     }
 }
 
-// Handle Turns
 function nextTurn() {
     turn = turn === 'Player' ? 'Computer' : 'Player';
 }
@@ -306,69 +324,123 @@ function computerTurn() {
     if (turn === 'Player') return;
 
     const [ranRow, ranCol] = getRandomPosition();
-    const arrayEl = playerBoard[ranRow][ranCol];
+    const arrayEl = playerBoard[ranRow][ranCol]; // 0, name of ship, hit, miss
     const [hit, miss] = ['hit', 'miss'];
 
-    if (lastComputerHits.at(-1)[2] === hit) {
-        console.log('Checking randomly around');
-        handleGuessNextCell(
-            lastComputerHits.at(-1)[0],
-            lastComputerHits.at(-1)[1]
-        );
-    } else if (!arrayEl) {
-        console.log('!arrayEl');
+    if (computerTurnLog.some(arr => arr[2] === 'hit')) {
+        const [lastRow, lastCol, lastHitOrMiss] = getLastHit()
+        handleGuessNextCell(lastRow, lastCol);
+    } else if (arrayEl === 0) {
         handleHits(ranRow, ranCol, miss);
-    } else if (
-        (typeof arrayEl === 'string' || arrayEl instanceof String) &&
-        arrayEl !== 'miss' &&
-        arrayEl !== 'hit'
-    ) {
-        console.log('type of === string');
+        computerTurnLog.pop()
+    } else if ((typeof arrayEl === 'string' || arrayEl instanceof String) && arrayEl !== 'miss' && arrayEl !== 'hit') {
         handleHits(ranRow, ranCol, hit);
     } else {
         return computerTurn();
     }
-
-    updateScores();
-    nextTurn();
+    if (turn === 'Computer') return nextTurn();
 }
 
 function getRandomPosition() {
     return [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
 }
 
-// if miss then miss
-// if hit then hit & store hit location
-// if last hit, generate random direction
-// check that direction for hit
-// if hit then hit & store hit location // if score increaes then delete hit location
-// if miss then miss
-// if hit existing hit/miss spot then rerun function
-
-
 function handleGuessNextCell(rowIdx, colIdx) {
     const [rowOffset, colOffset] = randomDirec();
     const newRow = rowIdx + rowOffset;
     const newCol = colIdx + colOffset;
+    const storeScore = [...score];
+    const lastHit = getLastHit()
 
-    console.log(rowIdx, colIdx, ' | ', newRow, newCol);
     if (isValidPosition(newRow, newCol)) {
         if (!playerBoard[newRow][newCol]) {
             handleHits(newRow, newCol, 'miss');
-        } else if (
-            playerBoard[newRow][newCol] !== 'hit' ||
-            playerBoard[newRow][newCol] !== 'miss'
-        ) {
+        } else if (checkIfSurrounded(lastHit[0], lastHit[1]) && score[1] === score[1]) {
+            computerTurnLog.splice(2)
+            handleGuessNextCell(lastHit[0], lastHit[1])
+        } else if (playerBoard[newRow][newCol] !== 'hit' && playerBoard[newRow][newCol] !== 'miss') {
             handleHits(newRow, newCol, 'hit');
-        } else if (
-            playerBoard[newRow][newCol] === 'hit' ||
-            playerBoard[newRow][newCol] === 'miss'
-        ) {
-            handleGuessNextCell(rowIdx, colIdx);
+            if (score[1] > storeScore[1]) {
+                computerTurnLog.splice(1)
+            } else {
+                clearLastMisses()
+            }
+        } else if (playerBoard[newRow][newCol] === 'hit' || playerBoard[newRow][newCol] === 'miss') {
+            if (checkIfSurrounded(lastHit[0], lastHit[1])) {
+                computerTurnLog.splice(2)
+                handleGuessNextCell(lastHit[0], lastHit[1])
+            }
+            handleGuessNextCell(lastHit[0], lastHit[1]);
         }
     } else {
         handleGuessNextCell(rowIdx, colIdx);
     }
+    checkWinner()
+}
+
+function checkWinner() {
+    const playerShipsDestroyed = LOOKUP[alliance].ships.filter((ship) => ship.hp === 0).length;
+    const computerShipsDestroyed = LOOKUP[enemyAlliance].ships.filter((ship) => ship.hp === 0).length;
+    if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
+        winner = 'Computer Wins'
+    } else if (computerShipsDestroyed === LOOKUP[enemyAlliance].ships) {
+        winner = 'Player Wins'
+    }
+    if (winner) {
+        endGame(winner);
+    }
+}
+
+function endGame(winner) {
+    computerBoardEl.style.display = 'none';
+    shipDock.style.display = 'none';
+    instructions.style.display = 'none';
+    scoresEl.style.display = 'none';
+    modal.style.display = 'none';
+    playerBoardEl.style.display = 'none';
+    shipDockIMGEls.innerHTML = '';
+    titleSection.style.display = 'none';
+
+    game = 2;
+    renderButtons();
+    stopMusic();
+    renderEndGameModal(winner);
+}
+
+function renderEndGameModal(winner) {
+    endGameModal.style.display = 'flex'
+}
+
+function checkIfSurrounded(rowIdx, colIdx) {
+    const directions = [
+        [0, -1],
+        [0, 1],
+        [1, 0],
+        [-1, 0],
+    ];
+    return directions.every(arr => {
+        if (!isValidPosition(rowIdx + arr[0], colIdx + arr[1])) return true;
+        const el = playerBoard[rowIdx + arr[0]][colIdx + arr[1]];
+        return el === 'hit' || el === 'miss';
+    })
+}
+
+function clearLastMisses() {
+    for (let i = computerTurnLog.length - 1; i >= 0; i--) {
+        if (computerTurnLog[i][2] === 'miss') {
+            computerTurnLog.splice(i, 1);
+        }
+    }
+}
+
+function getLastHit() {
+    console.log(computerTurnLog)
+    return computerTurnLog.reduceRight((result, currentArray) => {
+        if (!result && currentArray.includes('hit')) {
+            return currentArray;
+        }
+        return result;
+    }, null);
 }
 
 function isValidPosition(row, col) {
@@ -388,17 +460,12 @@ function randomDirec() {
 }
 
 function handleHits(rowIdx, colIdx, hitOrMiss) {
-    const nameOfShip =
-        turn === 'Player'
-            ? computerBoard[rowIdx][colIdx]
-            : playerBoard[rowIdx][colIdx];
+    const nameOfShip = turn === 'Player' ? computerBoard[rowIdx][colIdx] : playerBoard[rowIdx][colIdx];
     const currentEnemyAlliance = turn === 'Player' ? enemyAlliance : alliance;
     const currentCells = turn === 'Player' ? computerCells : playerCells;
     const shipInLookup = LOOKUP[currentEnemyAlliance].ships.find(
         (ship) => ship.name === nameOfShip
     );
-
-    console.log('HandleHits: ', rowIdx, colIdx);
 
     const cellEl = currentCells.find(
         (cell) => cell.id === `${rowIdx + 1}-${colIdx + 1}`
@@ -406,35 +473,21 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
 
     if (turn === 'Player') {
         computerBoard[rowIdx][colIdx] = hitOrMiss;
-        renderMessage(alliance, hitOrMiss)
+        renderMessage(alliance, hitOrMiss);
         cellEl.style.backgroundColor = LOOKUP[enemyAlliance].colors[hitOrMiss];
     } else {
-        if (hitOrMiss === 'hit' || hitOrMiss === 'miss') {
-            lastComputerHits.push([rowIdx, colIdx, hitOrMiss]);
-        } else if (lastComputerHits.at(-1)[2] === 'hit') {
-            lastComputerHits.pop();
+        computerTurnLog.push([rowIdx, colIdx, hitOrMiss]);
+        if (computerTurnLog.filter(arr => arr.includes('miss')).length >= 4) {
+            computerTurnLog.splice(1)
         }
         playerBoard[rowIdx][colIdx] = hitOrMiss;
-        renderMessage(enemyAlliance, hitOrMiss)
+        renderMessage(enemyAlliance, hitOrMiss);
         cellEl.style.backgroundColor = LOOKUP[alliance].colors[hitOrMiss];
     }
 
     if (!nameOfShip) return;
     shipInLookup.hp -= 1;
-}
-
-function updateScores() {
-    const playerShipsDestroyed = LOOKUP[alliance].ships.filter(
-        (ship) => ship.hp === 0
-    ).length;
-    const totalPlayerShips = LOOKUP[alliance].ships.length;
-    const computerShipsDestroyed = LOOKUP[enemyAlliance].ships.filter(
-        (ship) => ship.hp === 0
-    ).length;
-    const totalComputerShips = LOOKUP[enemyAlliance].ships.length;
-    score[1] = `${playerShipsDestroyed} / ${totalPlayerShips}`;
-    score[0] = `${computerShipsDestroyed} / ${totalComputerShips}`;
-    renderScores(alliance);
+    updateScores();
 }
 
 // Set Computer Board Ship Locations
