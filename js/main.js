@@ -89,6 +89,15 @@ const LOOKUP = {
     },
 };
 
+const HIT = 'hit';
+const MISS = 'miss';
+const DIRECTIONS = [
+    [0, -1],
+    [0, 1],
+    [1, 0],
+    [-1, 0],
+];
+
 const AUDIO = new Audio(
     'https://github.com/ChueyB/battleship/blob/main/assets/sounds/dueloffates.mp3?raw=true'
 );
@@ -276,6 +285,15 @@ function renderModal() {
     handleResetPlacement();
 }
 
+function renderMessage(ally, hitOrMiss) {
+
+    if (!game) {
+        message.innerHTML = `Welcome to the <span style="color:${LOOKUP[alliance].colors.hit};">${LOOKUP[alliance].name}</span>`
+    } else {
+        message.innerHTML = `<span style="color:${LOOKUP[ally].colors.hit};">${turn}</span> ${hitOrMiss}`
+    }
+}
+
 // Handles alliance choice at the start of game
 function handleAllianceChoice(e) {
     if (e.target.tagName !== 'IMG') return;
@@ -292,35 +310,21 @@ function handleAllianceChoice(e) {
     renderMessage()
 }
 
-function renderMessage(ally, hitOrMiss) {
-
-    if (!game) {
-        message.innerHTML = `Welcome to the <span style="color:${LOOKUP[alliance].colors.hit};">${LOOKUP[alliance].name}</span>`
-    } else {
-        message.innerHTML = `<span style="color:${LOOKUP[ally].colors.hit};">${turn}</span> ${hitOrMiss}`
-    }
-}
-
-function nextTurn() {
-    turn = turn === 'Player' ? 'Computer' : 'Player';
-}
-
 // Handle board clicking
 function handleClickingEnemyBoard(e) {
     if (e.target.tagName !== 'DIV' || !game || turn === 'Computer') return;
     const [rowIdx, colIdx] = e.target.id.split('-');
     const boardCell = computerBoard[rowIdx - 1][colIdx - 1];
-    const [hit, miss] = ['hit', 'miss'];
 
-    if (boardCell === 1 || boardCell === 2) return;
+    if (boardCell === HIT || boardCell === MISS) return;
 
     if (boardCell) {
         e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
-        handleHits(rowIdx - 1, colIdx - 1, hit);
+        handleHits(rowIdx - 1, colIdx - 1, HIT);
         updateScores();
     } else {
         e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.miss;
-        handleHits(rowIdx - 1, colIdx - 1, miss);
+        handleHits(rowIdx - 1, colIdx - 1, MISS);
     }
 
     nextTurn();
@@ -332,26 +336,21 @@ function computerTurn() {
     if (turn === 'Player') return;
 
     const [ranRow, ranCol] = getRandomPosition();
-    const arrayEl = playerBoard[ranRow][ranCol]; // 0, name of ship, hit, miss
-    const [hit, miss] = ['hit', 'miss'];
+    const arrayEl = playerBoard[ranRow][ranCol];
 
-    if (computerTurnLog.some(arr => arr[2] === 'hit')) {
+    if (computerTurnLog.some(arr => arr[2] === HIT)) {
         const [lastRow, lastCol, lastHitOrMiss] = getLastHit()
         handleGuessNextCell(lastRow, lastCol);
     } else if (arrayEl === 0) {
-        handleHits(ranRow, ranCol, miss);
+        handleHits(ranRow, ranCol, MISS);
         computerTurnLog.pop()
-    } else if ((typeof arrayEl === 'string' || arrayEl instanceof String) && arrayEl !== 'miss' && arrayEl !== 'hit') {
-        handleHits(ranRow, ranCol, hit);
+    } else if ((typeof arrayEl === 'string' || arrayEl instanceof String) && arrayEl !== MISS && arrayEl !== HIT) {
+        handleHits(ranRow, ranCol, HIT);
     } else {
         return computerTurn();
     }
     if (turn === 'Computer') return nextTurn();
     checkWinner()
-}
-
-function getRandomPosition() {
-    return [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
 }
 
 function handleGuessNextCell(rowIdx, colIdx) {
@@ -363,18 +362,18 @@ function handleGuessNextCell(rowIdx, colIdx) {
 
     if (isValidPosition(newRow, newCol)) {
         if (!playerBoard[newRow][newCol]) {
-            handleHits(newRow, newCol, 'miss');
+            handleHits(newRow, newCol, MISS);
         } else if (checkIfSurrounded(lastHit[0], lastHit[1]) && score[1] === score[1]) {
             computerTurnLog.splice(2)
             handleGuessNextCell(lastHit[0], lastHit[1])
-        } else if (playerBoard[newRow][newCol] !== 'hit' && playerBoard[newRow][newCol] !== 'miss') {
-            handleHits(newRow, newCol, 'hit');
+        } else if (playerBoard[newRow][newCol] !== HIT && playerBoard[newRow][newCol] !== MISS) {
+            handleHits(newRow, newCol, HIT);
             if (score[1] > storeScore[1]) {
                 computerTurnLog.splice(1)
             } else {
                 clearLastMisses()
             }
-        } else if (playerBoard[newRow][newCol] === 'hit' || playerBoard[newRow][newCol] === 'miss') {
+        } else if (playerBoard[newRow][newCol] === HIT || playerBoard[newRow][newCol] === MISS) {
             if (checkIfSurrounded(lastHit[0], lastHit[1])) {
                 computerTurnLog.splice(2)
                 handleGuessNextCell(lastHit[0], lastHit[1])
@@ -443,50 +442,11 @@ function renderEndGameModal(arr) {
 }
 
 function checkIfSurrounded(rowIdx, colIdx) {
-    const directions = [
-        [0, -1],
-        [0, 1],
-        [1, 0],
-        [-1, 0],
-    ];
-    return directions.every(arr => {
+    return DIRECTIONS.every(arr => {
         if (!isValidPosition(rowIdx + arr[0], colIdx + arr[1])) return true;
         const el = playerBoard[rowIdx + arr[0]][colIdx + arr[1]];
-        return el === 'hit' || el === 'miss';
+        return el === HIT || el === MISS;
     })
-}
-
-function clearLastMisses() {
-    for (let i = computerTurnLog.length - 1; i >= 0; i--) {
-        if (computerTurnLog[i][2] === 'miss') {
-            computerTurnLog.splice(i, 1);
-        }
-    }
-}
-
-function getLastHit() {
-    return computerTurnLog.reduceRight((result, currentArray) => {
-        if (!result && currentArray.includes('hit')) {
-            return currentArray;
-        }
-        return result;
-    }, null);
-}
-
-function isValidPosition(row, col) {
-    return row >= 0 && row < 10 && col >= 0 && col < 10;
-}
-
-function randomDirec() {
-    const directions = [
-        [0, -1],
-        [0, 1],
-        [1, 0],
-        [-1, 0],
-    ];
-
-    const randomIndex = Math.floor(Math.random() * directions.length);
-    return directions[randomIndex];
 }
 
 function handleHits(rowIdx, colIdx, hitOrMiss) {
@@ -507,7 +467,7 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
         cellEl.style.backgroundColor = LOOKUP[enemyAlliance].colors[hitOrMiss];
     } else {
         computerTurnLog.push([rowIdx, colIdx, hitOrMiss]);
-        if (computerTurnLog.filter(arr => arr.includes('miss')).length >= 4) {
+        if (computerTurnLog.filter(arr => arr.includes(MISS)).length >= 4) {
             computerTurnLog.splice(1)
         }
         playerBoard[rowIdx][colIdx] = hitOrMiss;
@@ -593,16 +553,16 @@ function renderShipDock() {
         return;
     }
 
-    const newIMG = document.createElement('img');
-    newIMG.classList.add('ship-image');
-    newIMG.id = `${alliance}-${Math.abs(count)}-${LOOKUP[alliance].ships[count].name
-        }`;
-    newIMG.src = LOOKUP[alliance].ships[count].img;
-    shipDockIMGEls.appendChild(newIMG);
+    renderShipImage(count)
 }
 
-function renderShipName(ship) {
-    shipName.innerText = ship ? ship.name : '';
+function renderShipImage(shipCount) {
+    const newIMG = document.createElement('img');
+    newIMG.classList.add('ship-image');
+    newIMG.id = `${alliance}-${Math.abs(shipCount)}-${LOOKUP[alliance].ships[shipCount].name
+        }`;
+    newIMG.src = LOOKUP[alliance].ships[shipCount].img;
+    shipDockIMGEls.appendChild(newIMG);
 }
 
 function handleButtonRotate() {
@@ -762,4 +722,44 @@ function cancelDrop(e) {
         const [row, col] = cell.id.split('-');
         return playerBoard[row - 1][col - 1] === 1;
     });
+}
+
+// Small helper functions
+
+function renderShipName(ship) {
+    shipName.innerText = ship ? ship.name : '';
+}
+
+function clearLastMisses() {
+    for (let i = computerTurnLog.length - 1; i >= 0; i--) {
+        if (computerTurnLog[i][2] === MISS) {
+            computerTurnLog.splice(i, 1);
+        }
+    }
+}
+
+function getLastHit() {
+    return computerTurnLog.reduceRight((result, currentArray) => {
+        if (!result && currentArray.includes(HIT)) {
+            return currentArray;
+        }
+        return result;
+    }, null);
+}
+
+function isValidPosition(row, col) {
+    return row >= 0 && row < 10 && col >= 0 && col < 10;
+}
+
+function randomDirec() {
+    const randomIndex = Math.floor(Math.random() * DIRECTIONS.length);
+    return DIRECTIONS[randomIndex];
+}
+
+function getRandomPosition() {
+    return [Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)];
+}
+
+function nextTurn() {
+    turn = turn === 'Player' ? 'Computer' : 'Player';
 }
