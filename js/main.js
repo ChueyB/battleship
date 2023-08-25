@@ -108,9 +108,9 @@ let computerTurnLog;
 
 /*----- cached elements  -----*/
 const modal = document.getElementById('modal');
-const endGameModal = document.getElementById('endgame-modal')
-const message = document.getElementById('message')
-const gameOverMessage = document.getElementById('gameover-message')
+const endGameModal = document.getElementById('endgame-modal');
+const message = document.getElementById('message');
+const gameOverMessage = document.getElementById('gameover-message');
 const playerCells = [...document.querySelectorAll('#player-board > div')];
 const computerCells = [...document.querySelectorAll('#computer-board > div')];
 const shipDockIMGEls = document.querySelector('#all-ships');
@@ -122,8 +122,13 @@ const computerBoardEl = document.querySelector('#computer-board');
 const shipName = document.getElementById('ship-name');
 const playBtn = document.getElementById('play-btn');
 const restartBtn = document.getElementById('restart-btn');
-const playAgainBtn = document.getElementById('play-again')
-const titleSection = document.getElementById('title')
+const playAgainBtn = document.getElementById('play-again');
+const titleSection = document.getElementById('title');
+const crawlTitle = document.getElementById('crawl-title');
+const loserName = [...document.querySelectorAll('.losing-alliance-name')];
+const winnerName = [...document.querySelectorAll('.winning-alliance-name')];
+const losingShipCount = [...document.querySelectorAll('.losing-alliance-ships')];
+const crawlParagraph = document.getElementById('crawl-paragraph')
 
 /*----- event listeners -----*/
 playBtn.addEventListener('click', handlePlay);
@@ -317,6 +322,7 @@ function handleClickingEnemyBoard(e) {
     }
 
     nextTurn();
+    checkWinner()
     setTimeout(computerTurn, 500);
 }
 
@@ -339,6 +345,7 @@ function computerTurn() {
         return computerTurn();
     }
     if (turn === 'Computer') return nextTurn();
+    checkWinner()
 }
 
 function getRandomPosition() {
@@ -383,7 +390,7 @@ function checkWinner() {
     const computerShipsDestroyed = LOOKUP[enemyAlliance].ships.filter((ship) => ship.hp === 0).length;
     if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
         winner = 'Computer Wins'
-    } else if (computerShipsDestroyed === LOOKUP[enemyAlliance].ships) {
+    } else if (computerShipsDestroyed === LOOKUP[enemyAlliance].ships.length) {
         winner = 'Player Wins'
     }
     if (winner) {
