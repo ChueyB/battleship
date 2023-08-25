@@ -1,5 +1,3 @@
-/*----- imports -----*/
-
 /*----- constants -----*/
 const LOOKUP = {
     galacticEmpire: {
@@ -120,7 +118,6 @@ let computerTurnLog;
 const modal = document.getElementById('modal');
 const endGameModal = document.getElementById('endgame-modal');
 const message = document.getElementById('message');
-const gameOverMessage = document.getElementById('gameover-message');
 const playerCells = [...document.querySelectorAll('#player-board > div')];
 const computerCells = [...document.querySelectorAll('#computer-board > div')];
 const shipDockIMGEls = document.querySelector('#all-ships');
@@ -211,8 +208,8 @@ function handlePlay() {
     instructions.style.display = 'none';
     playerBoardEl.style.gridColumn = '3 / 4';
 
-    updateScores();
     game = 1;
+    updateScores();
     renderButtons();
     playMusic();
 }
@@ -244,38 +241,27 @@ function renderButtons() {
     }
 }
 
-function renderScores(ally, totalPlayerShips, totalComputerShips) {
+function renderScores(totalPlayerShips, totalComputerShips) {
     scoresEl.style.display = 'grid';
     scoresEl.children[0].style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
-    scoresEl.children[1].style.backgroundColor = LOOKUP[ally].colors.hit;
+    scoresEl.children[1].style.backgroundColor = LOOKUP[alliance].colors.hit;
 
-    if (!game) return;
-
-    scoresEl.firstElementChild.innerText = `${score[0]} / ${totalComputerShips}`;
-    scoresEl.lastElementChild.innerText = `${score[1]} / ${totalPlayerShips}`;
+    if (game !== 0) {
+        scoresEl.firstElementChild.innerText = `${score[0] || 0} / ${totalComputerShips}`;
+        scoresEl.lastElementChild.innerText = `${score[1] || 0} / ${totalPlayerShips}`;
+    }
 }
 
 function updateScores() {
-    const playerShipsDestroyed = LOOKUP[alliance].ships.filter(
-        (ship) => ship.hp === 0
-    ).length;
+    const playerShipsDestroyed = getDestroyedShipCount(alliance)
     const totalPlayerShips = LOOKUP[alliance].ships.length;
-    const computerShipsDestroyed = LOOKUP[enemyAlliance].ships.filter(
-        (ship) => ship.hp === 0
-    ).length;
+    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance)
     const totalComputerShips = LOOKUP[enemyAlliance].ships.length;
+
     score[1] = playerShipsDestroyed;
     score[0] = computerShipsDestroyed;
-    renderScores(alliance, totalPlayerShips, totalComputerShips);
-}
 
-
-function getEnemyAlliance(ally) {
-    const enemyAlliance = Object.keys(LOOKUP).filter(
-        (key) => key !== 'special' && key !== ally
-    );
-
-    return enemyAlliance;
+    renderScores(totalPlayerShips, totalComputerShips);
 }
 
 function renderModal() {
@@ -321,7 +307,6 @@ function handleClickingEnemyBoard(e) {
     if (boardCell) {
         e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
         handleHits(rowIdx - 1, colIdx - 1, HIT);
-        updateScores();
     } else {
         e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.miss;
         handleHits(rowIdx - 1, colIdx - 1, MISS);
@@ -387,8 +372,8 @@ function handleGuessNextCell(rowIdx, colIdx) {
 }
 
 function checkWinner() {
-    const playerShipsDestroyed = LOOKUP[alliance].ships.filter((ship) => ship.hp === 0).length;
-    const computerShipsDestroyed = LOOKUP[enemyAlliance].ships.filter((ship) => ship.hp === 0).length;
+    const playerShipsDestroyed = getDestroyedShipCount(alliance)
+    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance)
     let loserShipCount;
     if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
         [winner, loser] = [LOOKUP[enemyAlliance].name, LOOKUP[alliance].name];
@@ -762,4 +747,16 @@ function getRandomPosition() {
 
 function nextTurn() {
     turn = turn === 'Player' ? 'Computer' : 'Player';
+}
+
+function getEnemyAlliance(ally) {
+    const enemyAlliance = Object.keys(LOOKUP).filter(
+        (key) => key !== 'special' && key !== ally
+    );
+
+    return enemyAlliance;
+}
+
+function getDestroyedShipCount(allianceVar) {
+    return LOOKUP[allianceVar].ships.filter((ship) => ship.hp === 0).length;
 }
