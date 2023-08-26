@@ -328,9 +328,9 @@ function handleClickingEnemyBoard(e) {
         handleHits(rowIdx - 1, colIdx - 1, MISS);
     }
 
+    checkWinner();
     nextTurn();
-    checkWinner()
-    setTimeout(computerTurn, 500);
+    setTimeout(computerTurn, 700);
 }
 
 function computerTurn() {
@@ -536,10 +536,10 @@ function checkWinner() {
     let loserShipCount;
     if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
         [winner, loser] = [LOOKUP[enemyAlliance].name, LOOKUP[alliance].name];
-        loserShipCount = LOOKUP[alliance].ships.filter((ship) => ship.hp === 0).length;
+        loserShipCount = playerShipsDestroyed;
     } else if (computerShipsDestroyed === LOOKUP[enemyAlliance].ships.length) {
         [winner, loser] = [LOOKUP[alliance].name, LOOKUP[enemyAlliance].name];
-        loserShipCount = LOOKUP[enemyAlliance].ships.filter((ship) => ship.hp === 0).length;
+        loserShipCount = computerShipsDestroyed;
     }
     if (winner) {
         endGame([winner, loser, loserShipCount]);
