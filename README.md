@@ -56,7 +56,7 @@ This is the childhood game of Battleship with a Star Wars twist. Fight for the E
 
 # Next Steps
 
-[] Add blaster animations
-[] Make computer smarter about choice
-[] Add rotate ship to scroll wheel
-[] Make ships draggable after placement
+- [] Add blaster animations
+- [] Make computer smarter about choice
+- [] Add rotate ship to scroll wheel
+- [] Make ships draggable after placement
