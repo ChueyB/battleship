@@ -91,12 +91,14 @@ const LOOKUP = {
         ],
     },
     special: {
-        deathstar: {
-            name: 'Deathstar',
-            img: 'assets/images/galactic_empire/deathstar.png',
-            hp: 100,
-            damageTaken: 0,
-        },
+        ships: [
+            {
+                name: 'Deathstar',
+                img: 'assets/images/galactic_empire/deathstar.png',
+                hp: 100,
+                damageTaken: 0,
+            },
+        ]
     },
 };
 
