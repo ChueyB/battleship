@@ -169,6 +169,9 @@ const LOOKUP = {
 
 const HIT = 'hit';
 const MISS = 'miss';
+const PLAYER = 'Player';
+const COMPUTER = 'Computer';
+
 const DIRECTIONS = [
     [0, -1],
     [0, 1],
@@ -239,21 +242,25 @@ function init() {
     winner = null;
     loser = null;
     score = [0, 0];
-    game = false;
+    game = 0;
     dragged = null;
     rotated = false;
     computerTurnLog = [[0, 0, 0]];
     playerBoard = [];
     computerBoard = [];
-    turn = 'Player';
+    turn = PLAYER;
 
     render();
 }
 
 function render() {
+    renderButtons();
     renderModal();
     renderComputerBoard();
     renderPlayerBoard();
+    renderMessage();
+    handleResetPlacement();
+    renderShipDock();
 }
 
 function renderComputerBoard() {
@@ -288,7 +295,7 @@ function handlePlay() {
     instructions.style.display = 'none';
     playerBoardEl.style.gridColumn = '3 / 4';
 
-    game = 1;
+    game = 2;
     updateScores();
     renderButtons();
     playMusic();
@@ -310,10 +317,10 @@ function handleRestartGame(g) {
 }
 
 function renderButtons() {
-    if (game === 2) {
+    if (!game) {
         playBtn.style.display = 'none';
         restartBtn.style.display = 'none';
-    } else if (game === 1) {
+    } else if (game === 2) {
         playBtn.style.display = 'none';
         restartBtn.style.display = 'grid';
     } else {
@@ -346,17 +353,17 @@ function updateScores() {
 }
 
 function renderModal() {
+    if (game > 0) return;
     modal.style.display = 'flex';
     playerBoardEl.style.display = 'none';
     shipDockIMGEls.innerHTML = '';
-    handleResetPlacement();
 }
 
 function renderMessage(ally, hitOrMiss) {
 
-    if (!game) {
+    if (game === 1) {
         message.innerHTML = `Welcome to the <span style="color:${LOOKUP[alliance].colors.hit};">${LOOKUP[alliance].name}</span>`;
-    } else {
+    } else if (game === 2) {
         message.innerHTML = `<span style="color:${LOOKUP[ally].colors.hit};">${turn}</span> ${hitOrMiss}`;
     }
 }
@@ -372,16 +379,14 @@ function handleAllianceChoice(e) {
     modal.style.display = 'none';
     playerBoardEl.style.display = 'grid';
     titleSection.style.display = 'grid';
-    game = 0;
-    renderShipDock();
-    renderButtons();
+    game = 1;
+    render();
     LOOKUP[enemyAlliance].placeShipsOnBoard(computerBoard);
-    renderMessage();
 }
 
 // Handle board clicking
 function handleClickingEnemyBoard(e) {
-    if (e.target.tagName !== 'DIV' || !game || turn === 'Computer') return;
+    if (e.target.tagName !== 'DIV' || !game || turn === COMPUTER) return;
     const [rowIdx, colIdx] = e.target.id.split('-');
     const boardCell = computerBoard[rowIdx - 1][colIdx - 1];
 
@@ -401,7 +406,7 @@ function handleClickingEnemyBoard(e) {
 }
 
 function computerTurn() {
-    if (turn === 'Player') return;
+    if (turn === PLAYER) return;
 
     const [ranRow, ranCol] = getRandomPosition();
     const arrayEl = playerBoard[ranRow][ranCol];
@@ -417,7 +422,7 @@ function computerTurn() {
     } else {
         return computerTurn();
     }
-    if (turn === 'Computer') return nextTurn();
+    if (turn === COMPUTER) return nextTurn();
     checkWinner();
 }
 
@@ -455,9 +460,9 @@ function handleGuessNextCell(rowIdx, colIdx) {
 }
 
 function handleHits(rowIdx, colIdx, hitOrMiss) {
-    const nameOfShip = turn === 'Player' ? computerBoard[rowIdx][colIdx] : playerBoard[rowIdx][colIdx];
-    const currentEnemyAlliance = turn === 'Player' ? enemyAlliance : alliance;
-    const currentCells = turn === 'Player' ? computerCells : playerCells;
+    const nameOfShip = turn === PLAYER ? computerBoard[rowIdx][colIdx] : playerBoard[rowIdx][colIdx];
+    const currentEnemyAlliance = turn === PLAYER ? enemyAlliance : alliance;
+    const currentCells = turn === PLAYER ? computerCells : playerCells;
     const currentEnemyShip = LOOKUP[currentEnemyAlliance].ships.find(
         (ship) => ship.name === nameOfShip
     );
@@ -466,7 +471,7 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
         (cell) => cell.id === `${rowIdx + 1}-${colIdx + 1}`
     );
 
-    if (turn === 'Player') {
+    if (turn === PLAYER) {
         computerBoard[rowIdx][colIdx] = hitOrMiss;
         renderMessage(alliance, hitOrMiss);
         cellEl.style.backgroundColor = LOOKUP[enemyAlliance].colors[hitOrMiss];
@@ -487,7 +492,8 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
 
 // handles all pre-game ship functions
 function renderShipDock() {
-    if (!alliance) return;
+    if (!alliance || game === 0) return;
+    console.log('test rsd');
 
     shipDock.style.display = 'grid';
     let count = playerCells.filter(
@@ -526,6 +532,7 @@ function handleButtonRotate() {
 }
 
 function handleResetPlacement() {
+    if (game === 0) return;
     playerCells.forEach(function (cell) {
         cell.innerHTML = '';
         cell.style.backgroundColor = 'transparent';
@@ -536,9 +543,6 @@ function handleResetPlacement() {
     });
     shipDockIMGEls.innerHTML = '';
     rotated = false;
-
-    renderPlayerBoard();
-    renderShipDock();
 }
 
 // All endgame functions
@@ -568,7 +572,7 @@ function endGame(arr) {
     shipDockIMGEls.innerHTML = '';
     titleSection.style.display = 'none';
 
-    game = 2;
+    game = 0;
     resetDamageTaken();
     renderButtons();
     stopMusic();
@@ -768,7 +772,7 @@ function getRandomPosition() {
 }
 
 function nextTurn() {
-    turn = turn === 'Player' ? 'Computer' : 'Player';
+    turn = turn === PLAYER ? COMPUTER : PLAYER;
 }
 
 function getEnemyAlliance(ally) {
@@ -792,6 +796,7 @@ function checkIfSurrounded(rowIdx, colIdx) {
 }
 
 function resetDamageTaken() {
+    if (game > 0) return;
     [LOOKUP[alliance].ships, LOOKUP[enemyAlliance].ships].forEach(shipsArray => {
         shipsArray.forEach(ship => {
             ship.damageTaken = 0;
