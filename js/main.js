@@ -1,9 +1,64 @@
 /*----- Classes -----*/
-class Alliance {
+class Faction {
     constructor(name, colors, ships) {
         this.name = name;
         this.colors = colors;
         this.ships = ships;
+    }
+
+    placeShipsOnBoard(board) {
+        this.ships.forEach(ship => {
+            this.placeShip(ship, board);
+        });
+    }
+
+    placeShip(ship, board) {
+        const rows = board.length;
+        const cols = board[0].length;
+        let placementIsValid = false;
+
+        while (!placementIsValid) {
+            const startRow = Math.floor(Math.random() * (rows - ship.hp + 1));
+            const startCol = Math.floor(Math.random() * (cols - ship.hp + 1));
+            const isVertical = Math.random() < 0.5;
+
+            let canPlace = true;
+
+            if (isVertical) {
+                for (let i = 0; i < ship.hp; i++) {
+                    if (
+                        startRow + i >= rows ||
+                        board[startRow + i][startCol] !== 0
+                    ) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+            } else {
+                for (let i = 0; i < ship.hp; i++) {
+                    if (
+                        startCol + i >= cols ||
+                        board[startRow][startCol + i] !== 0
+                    ) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+            }
+
+            if (canPlace) {
+                if (isVertical) {
+                    for (let i = 0; i < ship.hp; i++) {
+                        board[startRow + i][startCol] = ship.name;
+                    }
+                } else {
+                    for (let i = 0; i < ship.hp; i++) {
+                        board[startRow][startCol + i] = ship.name;
+                    }
+                }
+                placementIsValid = true;
+            }
+        }
     }
 }
 
@@ -18,7 +73,7 @@ class Ship {
 
 /*----- constants -----*/
 const LOOKUP = {
-    galacticEmpire: new Alliance(
+    galacticEmpire: new Faction(
         "Galactic Empire",
         {
             hit: 'rgba(184, 60, 65, 0.8)',
@@ -28,35 +83,30 @@ const LOOKUP = {
             new Ship(
                 'Bellator Dreadnaught',
                 'assets/images/galactic_empire/bellatorDreadnaught.png',
-                3,
-                0
+                3
             ),
             new Ship(
                 'CR 90',
                 'assets/images/galactic_empire/cr90.png',
-                3,
-                0
+                3
             ),
             new Ship(
                 'Imperial Freighter',
                 'assets/images/galactic_empire/imperialFreighter.png',
-                3,
-                0
+                3
             ),
             new Ship(
                 'Dreadnaught Cruiser',
                 'assets/images/galactic_empire/dreadnaughtCruiser.png',
-                6,
-                0
+                6
             ),
             new Ship(
                 'Tie Fighter',
                 'assets/images/galactic_empire/tieFighter.png',
-                1,
-                0
+                1
             )
         ]),
-    rebelAlliance: new Alliance(
+    rebelAlliance: new Faction(
         "Rebel Alliance",
         {
             hit: 'rgba(32, 80, 131, 0.8)',
@@ -66,48 +116,41 @@ const LOOKUP = {
             new Ship(
                 'X Wing',
                 'assets/images/rebel_alliance/xWing.png',
-                1,
-                0
+                1
             ),
             new Ship(
                 'Y Wing',
                 'assets/images/rebel_alliance/yWing.png',
-                2,
-                0
+                2
             ),
             new Ship(
                 'B Wing',
                 'assets/images/rebel_alliance/bWing.png',
-                2,
-                0
+                2
             ),
             new Ship(
                 'H6 Bomber',
                 'assets/images/rebel_alliance/h6Bomber.png',
-                2,
-                0
+                2
             ),
             new Ship(
                 'GR Transport',
                 'assets/images/rebel_alliance/grTransport.png',
-                3,
-                0
+                3
             ),
             new Ship(
                 'Hammerhead Corvette',
                 'assets/images/rebel_alliance/hammerheadCorvette.png',
-                4,
-                0
+                4
             ),
             new Ship(
                 'A Wing',
                 'assets/images/rebel_alliance/aWing.png',
-                1,
-                0
+                1
             )
         ]
     ),
-    special: new Alliance(
+    special: new Faction(
         "Deathstar",
         {
             hit: 'rgba(184, 60, 65, 0.8)',
@@ -332,7 +375,7 @@ function handleAllianceChoice(e) {
     game = 0;
     renderShipDock();
     renderButtons();
-    setComputerShips();
+    LOOKUP[enemyAlliance].placeShipsOnBoard(computerBoard);
     renderMessage();
 }
 
@@ -442,62 +485,7 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
     updateScores();
 }
 
-// Set Computer Board Ship Locations
-function setComputerShips() {
-    const enemyShips = LOOKUP[enemyAlliance].ships;
-    const rows = computerBoard.length;
-    const cols = computerBoard[0].length;
-
-    enemyShips.forEach((ship) => {
-        let placementIsValid = false;
-
-        while (!placementIsValid) {
-            const startRow = Math.floor(Math.random() * (rows - ship.hp + 1));
-            const startCol = Math.floor(Math.random() * (cols - ship.hp + 1));
-            const isVertical = Math.random() < 0.5;
-
-            let canPlace = true;
-
-            if (isVertical) {
-                for (let i = 0; i < ship.hp; i++) {
-                    if (
-                        startRow + i >= rows ||
-                        computerBoard[startRow + i][startCol] !== 0
-                    ) {
-                        canPlace = false;
-                        break;
-                    }
-                }
-            } else {
-                for (let i = 0; i < ship.hp; i++) {
-                    if (
-                        startCol + i >= cols ||
-                        computerBoard[startRow][startCol + i] !== 0
-                    ) {
-                        canPlace = false;
-                        break;
-                    }
-                }
-            }
-
-            if (canPlace) {
-                if (isVertical) {
-                    for (let i = 0; i < ship.hp; i++) {
-                        computerBoard[startRow + i][startCol] = ship.name;
-                    }
-                } else {
-                    for (let i = 0; i < ship.hp; i++) {
-                        computerBoard[startRow][startCol + i] = ship.name;
-                    }
-                }
-                placementIsValid = true;
-            }
-        }
-    });
-}
-
 // handles all pre-game ship functions
-
 function renderShipDock() {
     if (!alliance) return;
 
