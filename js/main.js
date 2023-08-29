@@ -200,8 +200,8 @@ let game;
 let winner;
 let loser;
 let score;
-let alliance;
-let enemyAlliance;
+let faction;
+let enemyFaction;
 let playerBoard;
 let computerBoard;
 let dragged;
@@ -227,16 +227,16 @@ const restartBtn = document.getElementById('restart-btn');
 const playAgainBtn = document.getElementById('play-again');
 const titleSection = document.getElementById('title');
 const crawlTitle = document.getElementById('crawl-title');
-const loserName = [...document.querySelectorAll('.losing-alliance-name')];
-const winnerName = [...document.querySelectorAll('.winning-alliance-name')];
-const losingShipCount = [...document.querySelectorAll('.losing-alliance-ships')];
+const loserName = [...document.querySelectorAll('.losing-faction-name')];
+const winnerName = [...document.querySelectorAll('.winning-faction-name')];
+const losingShipCount = [...document.querySelectorAll('.losing-faction-ships')];
 const crawlParagraph = document.getElementById('crawl-paragraph');
 
 /*----- event listeners -----*/
 playBtn.addEventListener('click', handlePlay);
 restartBtn.addEventListener('click', handleRestartGame);
 playAgainBtn.addEventListener('click', handleRestartGame);
-document.querySelector('.modal-content').addEventListener('click', handleAllianceChoice);
+document.querySelector('.modal-content').addEventListener('click', handleFactionChoice);
 document.getElementById('rotate-ship').addEventListener('click', handleButtonRotate);
 document.getElementById('reset-placement').addEventListener('click', handleResetPlacement);
 shipDockIMGEls.addEventListener('dragstart', handleDragStart);
@@ -249,8 +249,8 @@ computerBoardEl.addEventListener('click', handleClickingEnemyBoard);
 init();
 
 function init() {
-    alliance = null;
-    enemyAlliance = null;
+    faction = null;
+    enemyFaction = null;
     winner = null;
     loser = null;
     score = [0, 0];
@@ -343,8 +343,8 @@ function renderButtons() {
 
 function renderScores(totalPlayerShips, totalComputerShips) {
     scoresEl.style.display = LOOKUP_STYLES.GRID;
-    scoresEl.children[0].style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
-    scoresEl.children[1].style.backgroundColor = LOOKUP[alliance].colors.hit;
+    scoresEl.children[0].style.backgroundColor = LOOKUP[enemyFaction].colors.hit;
+    scoresEl.children[1].style.backgroundColor = LOOKUP[faction].colors.hit;
 
     if (game !== 0) {
         scoresEl.firstElementChild.innerText = `${score[0] || 0} / ${totalComputerShips}`;
@@ -353,10 +353,10 @@ function renderScores(totalPlayerShips, totalComputerShips) {
 }
 
 function updateScores() {
-    const playerShipsDestroyed = getDestroyedShipCount(alliance);
-    const totalPlayerShips = LOOKUP[alliance].ships.length;
-    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance);
-    const totalComputerShips = LOOKUP[enemyAlliance].ships.length;
+    const playerShipsDestroyed = getDestroyedShipCount(faction);
+    const totalPlayerShips = LOOKUP[faction].ships.length;
+    const computerShipsDestroyed = getDestroyedShipCount(enemyFaction);
+    const totalComputerShips = LOOKUP[enemyFaction].ships.length;
 
     score[1] = playerShipsDestroyed;
     score[0] = computerShipsDestroyed;
@@ -374,26 +374,26 @@ function renderModal() {
 function renderMessage(ally, hitOrMiss) {
 
     if (game === 1) {
-        message.innerHTML = `Welcome to the <span style="color:${LOOKUP[alliance].colors.hit};">${LOOKUP[alliance].name}</span>`;
+        message.innerHTML = `Welcome to the <span style="color:${LOOKUP[faction].colors.hit};">${LOOKUP[faction].name}</span>`;
     } else if (game === 2) {
         message.innerHTML = `<span style="color:${LOOKUP[ally].colors.hit};">${turn}</span> ${hitOrMiss}`;
     }
 }
 
-// Handles alliance choice at the start of game
-function handleAllianceChoice(e) {
+// Handles faction choice at the start of game
+function handleFactionChoice(e) {
     if (e.target.tagName !== 'IMG') return;
 
-    alliance = e.target.id;
-    enemyAlliance = getEnemyAlliance(alliance);
-    enemyShipArray = LOOKUP[enemyAlliance].ships;
-    playerShipArray = LOOKUP[alliance].ships;
+    faction = e.target.id;
+    enemyFaction = getEnemyFaction(faction);
+    enemyShipArray = LOOKUP[enemyFaction].ships;
+    playerShipArray = LOOKUP[faction].ships;
     modal.style.display = LOOKUP_STYLES.NONE;
     playerBoardEl.style.display = LOOKUP_STYLES.GRID;
     titleSection.style.display = LOOKUP_STYLES.GRID;
     game = 1;
     render();
-    LOOKUP[enemyAlliance].placeShipsOnBoard(computerBoard);
+    LOOKUP[enemyFaction].placeShipsOnBoard(computerBoard);
 }
 
 // Handle board clicking
@@ -405,10 +405,10 @@ function handleClickingEnemyBoard(e) {
     if (boardCell === HIT || boardCell === MISS) return;
 
     if (boardCell) {
-        e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
+        e.target.style.backgroundColor = LOOKUP[enemyFaction].colors.hit;
         handleHits(rowIdx - 1, colIdx - 1, HIT);
     } else {
-        e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.miss;
+        e.target.style.backgroundColor = LOOKUP[enemyFaction].colors.miss;
         handleHits(rowIdx - 1, colIdx - 1, MISS);
     }
 
@@ -429,7 +429,12 @@ function computerTurn() {
     } else if (arrayEl === 0) {
         handleHits(ranRow, ranCol, MISS);
         computerTurnLog.pop();
-    } else if ((typeof arrayEl === 'string' || arrayEl instanceof String) && arrayEl !== MISS && arrayEl !== HIT) {
+    } else if ((
+        typeof arrayEl === 'string'
+        || arrayEl instanceof String)
+        && arrayEl !== MISS
+        && arrayEl !== HIT
+    ) {
         handleHits(ranRow, ranCol, HIT);
     } else {
         return computerTurn();
@@ -472,10 +477,12 @@ function handleGuessNextCell(rowIdx, colIdx) {
 }
 
 function handleHits(rowIdx, colIdx, hitOrMiss) {
-    const nameOfShip = turn === PLAYER ? computerBoard[rowIdx][colIdx] : playerBoard[rowIdx][colIdx];
-    const currentEnemyAlliance = turn === PLAYER ? enemyAlliance : alliance;
+    const nameOfShip = turn === PLAYER
+        ? computerBoard[rowIdx][colIdx]
+        : playerBoard[rowIdx][colIdx];
+    const currentEnemyFaction = turn === PLAYER ? enemyFaction : faction;
     const currentCells = turn === PLAYER ? computerCells : playerCells;
-    const currentEnemyShip = LOOKUP[currentEnemyAlliance].ships.find(
+    const currentEnemyShip = LOOKUP[currentEnemyFaction].ships.find(
         (ship) => ship.name === nameOfShip
     );
 
@@ -485,16 +492,16 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
 
     if (turn === PLAYER) {
         computerBoard[rowIdx][colIdx] = hitOrMiss;
-        renderMessage(alliance, hitOrMiss);
-        cellEl.style.backgroundColor = LOOKUP[enemyAlliance].colors[hitOrMiss];
+        renderMessage(faction, hitOrMiss);
+        cellEl.style.backgroundColor = LOOKUP[enemyFaction].colors[hitOrMiss];
     } else {
         computerTurnLog.push([rowIdx, colIdx, hitOrMiss]);
         if (computerTurnLog.filter(arr => arr.includes(MISS)).length >= 4) {
             computerTurnLog.splice(1);
         }
         playerBoard[rowIdx][colIdx] = hitOrMiss;
-        renderMessage(enemyAlliance, hitOrMiss);
-        cellEl.style.backgroundColor = LOOKUP[alliance].colors[hitOrMiss];
+        renderMessage(enemyFaction, hitOrMiss);
+        cellEl.style.backgroundColor = LOOKUP[faction].colors[hitOrMiss];
     }
 
     if (!nameOfShip) return;
@@ -504,18 +511,18 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
 
 // handles all pre-game ship functions
 function renderShipDock() {
-    if (!alliance || game === 0) return;
+    if (!faction || game === 0) return;
 
     shipDock.style.display = LOOKUP_STYLES.GRID;
     let count = playerCells.filter(
         (cell) => cell.childElementCount >= 1
     ).length;
 
-    renderShipName(LOOKUP[alliance].ships[count]);
+    renderShipName(LOOKUP[faction].ships[count]);
 
     if (
-        (alliance === 'galacticEmpire' && count > 4) ||
-        (alliance === 'rebelAlliance' && count > 6)
+        (faction === 'galacticEmpire' && count > 4) ||
+        (faction === 'rebelAlliance' && count > 6)
     ) {
         return;
     }
@@ -526,9 +533,9 @@ function renderShipDock() {
 function renderShipImage(shipCount) {
     const newIMG = document.createElement('img');
     newIMG.classList.add('ship-image');
-    newIMG.id = `${alliance}-${Math.abs(shipCount)}-${LOOKUP[alliance].ships[shipCount].name
+    newIMG.id = `${faction}-${Math.abs(shipCount)}-${LOOKUP[faction].ships[shipCount].name
         }`;
-    newIMG.src = LOOKUP[alliance].ships[shipCount].img;
+    newIMG.src = LOOKUP[faction].ships[shipCount].img;
     shipDockIMGEls.appendChild(newIMG);
 }
 
@@ -546,11 +553,11 @@ function handleResetPlacement() {
     if (game === 0) return;
     playerCells.forEach(function (cell) {
         cell.innerHTML = '';
-        cell.style.backgroundColor = LOOKUP_STYLES.TRANSARENT;
+        cell.style.backgroundColor = LOOKUP_STYLES.TRANS;
     });
     computerCells.forEach(function (cell) {
         cell.innerHTML = '';
-        cell.style.backgroundColor = LOOKUP_STYLES.TRANSARENT;
+        cell.style.backgroundColor = LOOKUP_STYLES.TRANS;
     });
     shipDockIMGEls.innerHTML = '';
     rotated = false;
@@ -558,14 +565,14 @@ function handleResetPlacement() {
 
 // All endgame functions
 function checkWinner() {
-    const playerShipsDestroyed = getDestroyedShipCount(alliance);
-    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance);
+    const playerShipsDestroyed = getDestroyedShipCount(faction);
+    const computerShipsDestroyed = getDestroyedShipCount(enemyFaction);
     let loserShipCount;
-    if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
-        [winner, loser] = [LOOKUP[enemyAlliance].name, LOOKUP[alliance].name];
+    if (playerShipsDestroyed === LOOKUP[faction].ships.length) {
+        [winner, loser] = [LOOKUP[enemyFaction].name, LOOKUP[faction].name];
         loserShipCount = playerShipsDestroyed;
-    } else if (computerShipsDestroyed === LOOKUP[enemyAlliance].ships.length) {
-        [winner, loser] = [LOOKUP[alliance].name, LOOKUP[enemyAlliance].name];
+    } else if (computerShipsDestroyed === LOOKUP[enemyFaction].ships.length) {
+        [winner, loser] = [LOOKUP[faction].name, LOOKUP[enemyFaction].name];
         loserShipCount = computerShipsDestroyed;
     }
     if (winner) {
@@ -600,7 +607,7 @@ function renderEndGameModal(arr) {
     computerBoard.forEach(row => {
         playerAttempts += row.filter(elVal => elVal !== 0).length;
     });
-    const winAttempts = winName === LOOKUP[alliance].name ? playerAttempts : computerAttempts;
+    const winAttempts = winName === LOOKUP[faction].name ? playerAttempts : computerAttempts;
     crawlTitle.innerText = `${winName} Wins`;
     winnerName.forEach(el => {
         el.innerText = winName;
@@ -616,8 +623,8 @@ function renderEndGameModal(arr) {
 // Properly place the image into the grid
 function imageIntoGrid(e) {
     const { matchingCells } = getShipHoverLength(e);
-    const [allianceName, shipID, shipName] = dragged.id.split('-');
-    const shipHealth = LOOKUP[allianceName].ships[shipID].hp;
+    const [factionName, shipID, shipName] = dragged.id.split('-');
+    const shipHealth = LOOKUP[factionName].ships[shipID].hp;
 
     const [getRow, getCol] = matchingCells[0].id.split('-');
     const cellWidth = matchingCells[0].clientWidth;
@@ -636,8 +643,8 @@ function imageIntoGrid(e) {
 
 function getShipHoverLength(e) {
     const divEls = e.target.id.split('-');
-    const [allianceName, shipID, shipName] = dragged.id.split('-');
-    const hp = LOOKUP[allianceName].ships[shipID].hp;
+    const [factionName, shipID, shipName] = dragged.id.split('-');
+    const hp = LOOKUP[factionName].ships[shipID].hp;
     const row = parseInt(divEls[0]);
     const col = parseInt(divEls[1]);
     const parentAndIndex = [];
@@ -680,8 +687,8 @@ function cellColorOnHover(e) {
     const { parentAndIndex } = getShipHoverLength(e);
     const backgroundColor =
         e.type === 'dragleave' || e.type === 'drop'
-            ? LOOKUP_STYLES.TRANSARENT
-            : LOOKUP[alliance].colors.hit;
+            ? LOOKUP_STYLES.TRANS
+            : LOOKUP[faction].colors.hit;
     parentAndIndex.forEach((cell) => {
         const hoveredCells = playerCells[cell.index];
         hoveredCells.style.backgroundColor = backgroundColor;
@@ -690,8 +697,8 @@ function cellColorOnHover(e) {
 }
 
 function getShipLength(e) {
-    const [chosenAlliance, shipIdx] = e.id.split('-');
-    return LOOKUP[chosenAlliance].ships[`${shipIdx}`].hp;
+    const [chosenFaction, shipIdx] = e.id.split('-');
+    return LOOKUP[chosenFaction].ships[`${shipIdx}`].hp;
 }
 
 function handleArrayPlacement(obj) {
@@ -786,16 +793,16 @@ function nextTurn() {
     turn = turn === PLAYER ? COMPUTER : PLAYER;
 }
 
-function getEnemyAlliance(ally) {
-    const enemyAlliance = Object.keys(LOOKUP).filter(
+function getEnemyFaction(ally) {
+    const enemyFaction = Object.keys(LOOKUP).filter(
         (key) => key !== 'special' && key !== ally
     );
 
-    return enemyAlliance;
+    return enemyFaction;
 }
 
-function getDestroyedShipCount(allianceVar) {
-    return LOOKUP[allianceVar].ships.filter((ship) => ship.damageTaken === ship.hp).length;
+function getDestroyedShipCount(factionVar) {
+    return LOOKUP[factionVar].ships.filter((ship) => ship.damageTaken === ship.hp).length;
 }
 
 function checkIfSurrounded(rowIdx, colIdx) {
@@ -808,7 +815,7 @@ function checkIfSurrounded(rowIdx, colIdx) {
 
 function resetDamageTaken() {
     if (game > 0) return;
-    [LOOKUP[alliance].ships, LOOKUP[enemyAlliance].ships].forEach(shipsArray => {
+    [LOOKUP[faction].ships, LOOKUP[enemyFaction].ships].forEach(shipsArray => {
         shipsArray.forEach(ship => {
             ship.damageTaken = 0;
         });
