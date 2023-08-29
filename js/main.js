@@ -167,6 +167,18 @@ const LOOKUP = {
     )
 };
 
+const LOOKUP_STYLES = {
+    GRID: 'grid',
+    NONE: 'none',
+    FLEX: 'flex',
+    ABS: 'absolute',
+    TRANS: 'transparent',
+    PREPGRID: '2 / 3',
+    GAMEGRID: '3 / 4',
+    DEG0: '0deg',
+    DEG90: '90deg'
+};
+
 const HIT = 'hit';
 const MISS = 'miss';
 const PLAYER = 'Player';
@@ -269,7 +281,7 @@ function renderComputerBoard() {
 
 function renderPlayerBoard() {
     playerBoard = createBoards(10, 10);
-    playerBoardEl.style.gridColumn = '2 / 3';
+    playerBoardEl.style.gridColumn = LOOKUP_STYLES.PREPGRID;
 }
 
 function playMusic() {
@@ -290,10 +302,10 @@ function createBoards(rows, cols) {
 function handlePlay() {
     if (shipDockIMGEls.childElementCount >= 1) return;
 
-    computerBoardEl.style.display = 'grid';
-    shipDock.style.display = 'none';
-    instructions.style.display = 'none';
-    playerBoardEl.style.gridColumn = '3 / 4';
+    computerBoardEl.style.display = LOOKUP_STYLES.GRID;
+    shipDock.style.display = LOOKUP_STYLES.NONE;
+    instructions.style.display = LOOKUP_STYLES.NONE;
+    playerBoardEl.style.gridColumn = LOOKUP_STYLES.GAMEGRID;
 
     game = 2;
     updateScores();
@@ -301,13 +313,13 @@ function handlePlay() {
     playMusic();
 }
 
-function handleRestartGame(g) {
-    computerBoardEl.style.display = 'none';
-    shipDock.style.display = 'grid';
-    instructions.style.display = 'flex';
-    playerBoardEl.style.gridColumn = '2 / 4';
-    scoresEl.style.display = 'none';
-    endGameModal.style.display = 'none';
+function handleRestartGame() {
+    computerBoardEl.style.display = LOOKUP_STYLES.NONE;
+    shipDock.style.display = LOOKUP_STYLES.GRID;
+    instructions.style.display = LOOKUP_STYLES.FLEX;
+    playerBoardEl.style.gridColumn = '2 / 3';
+    scoresEl.style.display = LOOKUP_STYLES.NONE;
+    endGameModal.style.display = LOOKUP_STYLES.NONE;
 
     game = 0;
     computerTurnLog.length = 0;
@@ -318,19 +330,19 @@ function handleRestartGame(g) {
 
 function renderButtons() {
     if (!game) {
-        playBtn.style.display = 'none';
-        restartBtn.style.display = 'none';
+        playBtn.style.display = LOOKUP_STYLES.NONE;
+        restartBtn.style.display = LOOKUP_STYLES.NONE;
     } else if (game === 2) {
-        playBtn.style.display = 'none';
-        restartBtn.style.display = 'grid';
+        playBtn.style.display = LOOKUP_STYLES.NONE;
+        restartBtn.style.display = LOOKUP_STYLES.GRID;
     } else {
-        playBtn.style.display = 'grid';
-        restartBtn.style.display = 'none';
+        playBtn.style.display = LOOKUP_STYLES.GRID;
+        restartBtn.style.display = LOOKUP_STYLES.NONE;
     }
 }
 
 function renderScores(totalPlayerShips, totalComputerShips) {
-    scoresEl.style.display = 'grid';
+    scoresEl.style.display = LOOKUP_STYLES.GRID;
     scoresEl.children[0].style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
     scoresEl.children[1].style.backgroundColor = LOOKUP[alliance].colors.hit;
 
@@ -354,8 +366,8 @@ function updateScores() {
 
 function renderModal() {
     if (game > 0) return;
-    modal.style.display = 'flex';
-    playerBoardEl.style.display = 'none';
+    modal.style.display = LOOKUP_STYLES.FLEX;
+    playerBoardEl.style.display = LOOKUP_STYLES.NONE;
     shipDockIMGEls.innerHTML = '';
 }
 
@@ -376,9 +388,9 @@ function handleAllianceChoice(e) {
     enemyAlliance = getEnemyAlliance(alliance);
     enemyShipArray = LOOKUP[enemyAlliance].ships;
     playerShipArray = LOOKUP[alliance].ships;
-    modal.style.display = 'none';
-    playerBoardEl.style.display = 'grid';
-    titleSection.style.display = 'grid';
+    modal.style.display = LOOKUP_STYLES.NONE;
+    playerBoardEl.style.display = LOOKUP_STYLES.GRID;
+    titleSection.style.display = LOOKUP_STYLES.GRID;
     game = 1;
     render();
     LOOKUP[enemyAlliance].placeShipsOnBoard(computerBoard);
@@ -412,7 +424,7 @@ function computerTurn() {
     const arrayEl = playerBoard[ranRow][ranCol];
 
     if (computerTurnLog.some(arr => arr[2] === HIT)) {
-        const [lastRow, lastCol, lastHitOrMiss] = getLastHit();
+        const [lastRow, lastCol, _] = getLastHit();
         handleGuessNextCell(lastRow, lastCol);
     } else if (arrayEl === 0) {
         handleHits(ranRow, ranCol, MISS);
@@ -493,9 +505,8 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
 // handles all pre-game ship functions
 function renderShipDock() {
     if (!alliance || game === 0) return;
-    console.log('test rsd');
 
-    shipDock.style.display = 'grid';
+    shipDock.style.display = LOOKUP_STYLES.GRID;
     let count = playerCells.filter(
         (cell) => cell.childElementCount >= 1
     ).length;
@@ -522,11 +533,11 @@ function renderShipImage(shipCount) {
 }
 
 function handleButtonRotate() {
-    if (shipDockIMGEls.firstElementChild.style.rotate === '0deg') {
-        shipDockIMGEls.firstElementChild.style.rotate = '90deg';
+    if (shipDockIMGEls.firstElementChild.style.rotate === LOOKUP_STYLES.DEG0) {
+        shipDockIMGEls.firstElementChild.style.rotate = LOOKUP_STYLES.DEG90;
         rotated = true;
     } else {
-        shipDockIMGEls.firstElementChild.style.rotate = '0deg';
+        shipDockIMGEls.firstElementChild.style.rotate = LOOKUP_STYLES.DEG0;
         rotated = false;
     }
 }
@@ -535,11 +546,11 @@ function handleResetPlacement() {
     if (game === 0) return;
     playerCells.forEach(function (cell) {
         cell.innerHTML = '';
-        cell.style.backgroundColor = 'transparent';
+        cell.style.backgroundColor = LOOKUP_STYLES.TRANSARENT;
     });
     computerCells.forEach(function (cell) {
         cell.innerHTML = '';
-        cell.style.backgroundColor = 'transparent';
+        cell.style.backgroundColor = LOOKUP_STYLES.TRANSARENT;
     });
     shipDockIMGEls.innerHTML = '';
     rotated = false;
@@ -563,14 +574,14 @@ function checkWinner() {
 }
 
 function endGame(arr) {
-    computerBoardEl.style.display = 'none';
-    shipDock.style.display = 'none';
-    instructions.style.display = 'none';
-    scoresEl.style.display = 'none';
-    modal.style.display = 'none';
-    playerBoardEl.style.display = 'none';
+    computerBoardEl.style.display = LOOKUP_STYLES.NONE;
+    shipDock.style.display = LOOKUP_STYLES.NONE;
+    instructions.style.display = LOOKUP_STYLES.NONE;
+    scoresEl.style.display = LOOKUP_STYLES.NONE;
+    modal.style.display = LOOKUP_STYLES.NONE;
+    playerBoardEl.style.display = LOOKUP_STYLES.NONE;
     shipDockIMGEls.innerHTML = '';
-    titleSection.style.display = 'none';
+    titleSection.style.display = LOOKUP_STYLES.NONE;
 
     game = 0;
     resetDamageTaken();
@@ -599,7 +610,7 @@ function renderEndGameModal(arr) {
     });
     losingShipCount[0].innerText = loserShipCount;
     crawlParagraph.innerText = `While the ${winName} might have been victorious this time, it still took them ${winAttempts} attempts to destroy the ${loseName}'s Fleet.`;
-    endGameModal.style.display = 'flex';
+    endGameModal.style.display = LOOKUP_STYLES.FLEX;
 }
 
 // Properly place the image into the grid
@@ -614,7 +625,7 @@ function imageIntoGrid(e) {
     const imgWidth = cellWidth * shipHealth;
     const imgHeight = cellHeight;
 
-    dragged.style.position = 'absolute';
+    dragged.style.position = LOOKUP_STYLES.ABS;
     dragged.style.width = `${imgWidth}px`;
     dragged.style.height = `${imgHeight}px`;
     if (rotated) {
@@ -669,7 +680,7 @@ function cellColorOnHover(e) {
     const { parentAndIndex } = getShipHoverLength(e);
     const backgroundColor =
         e.type === 'dragleave' || e.type === 'drop'
-            ? 'transparent'
+            ? LOOKUP_STYLES.TRANSARENT
             : LOOKUP[alliance].colors.hit;
     parentAndIndex.forEach((cell) => {
         const hoveredCells = playerCells[cell.index];
