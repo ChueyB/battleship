@@ -1,105 +1,127 @@
+/*----- Classes -----*/
+class Alliance {
+    constructor(name, colors, ships) {
+        this.name = name;
+        this.colors = colors;
+        this.ships = ships;
+    }
+}
+
+class Ship {
+    constructor(name, img, hp) {
+        this.name = name;
+        this.img = img;
+        this.hp = hp;
+        this.damageTaken = 0;
+    }
+}
+
 /*----- constants -----*/
 const LOOKUP = {
-    galacticEmpire: {
-        name: "Galactic Empire",
-        colors: {
+    galacticEmpire: new Alliance(
+        "Galactic Empire",
+        {
             hit: 'rgba(184, 60, 65, 0.8)',
             miss: 'rgba(255, 255, 255, 0.7)',
         },
-        ships: [
-            {
-                name: 'Bellator Dreadnaught',
-                img: 'assets/images/galactic_empire/bellatorDreadnaught.png',
-                hp: 3,
-                damageTaken: 0,
-            },
-            {
-                name: 'CR 90',
-                img: 'assets/images/galactic_empire/cr90.png',
-                hp: 3,
-                damageTaken: 0,
-            },
-            {
-                name: 'Imperial Freighter',
-                img: 'assets/images/galactic_empire/imperialFreighter.png',
-                hp: 3,
-                damageTaken: 0,
-            },
-            {
-                name: 'Dreadnaught Cruiser',
-                img: 'assets/images/galactic_empire/dreadnaughtCruiser.png',
-                hp: 6,
-                damageTaken: 0,
-            },
-            {
-                name: 'Tie Fighter',
-                img: 'assets/images/galactic_empire/tieFighter.png',
-                hp: 1,
-                damageTaken: 0,
-            },
-        ],
-    },
-    rebelAlliance: {
-        name: "Rebel Alliance",
-        colors: {
+        [
+            new Ship(
+                'Bellator Dreadnaught',
+                'assets/images/galactic_empire/bellatorDreadnaught.png',
+                3,
+                0
+            ),
+            new Ship(
+                'CR 90',
+                'assets/images/galactic_empire/cr90.png',
+                3,
+                0
+            ),
+            new Ship(
+                'Imperial Freighter',
+                'assets/images/galactic_empire/imperialFreighter.png',
+                3,
+                0
+            ),
+            new Ship(
+                'Dreadnaught Cruiser',
+                'assets/images/galactic_empire/dreadnaughtCruiser.png',
+                6,
+                0
+            ),
+            new Ship(
+                'Tie Fighter',
+                'assets/images/galactic_empire/tieFighter.png',
+                1,
+                0
+            )
+        ]),
+    rebelAlliance: new Alliance(
+        "Rebel Alliance",
+        {
             hit: 'rgba(32, 80, 131, 0.8)',
             miss: 'rgba(255, 255, 255, 0.7)',
         },
-        ships: [
-            {
-                name: 'X Wing',
-                img: 'assets/images/rebel_alliance/xWing.png',
-                hp: 1,
-                damageTaken: 0,
-            },
-            {
-                name: 'Y Wing',
-                img: 'assets/images/rebel_alliance/yWing.png',
-                hp: 2,
-                damageTaken: 0,
-            },
-            {
-                name: 'B Wing',
-                img: 'assets/images/rebel_alliance/bWing.png',
-                hp: 2,
-                damageTaken: 0,
-            },
-            {
-                name: 'H6 Bomber',
-                img: 'assets/images/rebel_alliance/h6Bomber.png',
-                hp: 2,
-                damageTaken: 0,
-            },
-            {
-                name: 'GR Transport',
-                img: 'assets/images/rebel_alliance/grTransport.png',
-                hp: 3,
-                damageTaken: 0,
-            },
-            {
-                name: 'Hammerhead Corvette',
-                img: 'assets/images/rebel_alliance/hammerheadCorvette.png',
-                hp: 4,
-                damageTaken: 0,
-            },
-            {
-                name: 'A Wing',
-                img: 'assets/images/rebel_alliance/aWing.png',
-                hp: 1,
-                damageTaken: 0,
-            },
-        ],
-    },
-    special: {
-        ships: [
-            {
-                name: 'Deathstar',
-                img: 'assets/images/galactic_empire/deathstar.png',
-                hp: 100,
-                damageTaken: 0,
-            },
+        [
+            new Ship(
+                'X Wing',
+                'assets/images/rebel_alliance/xWing.png',
+                1,
+                0
+            ),
+            new Ship(
+                'Y Wing',
+                'assets/images/rebel_alliance/yWing.png',
+                2,
+                0
+            ),
+            new Ship(
+                'B Wing',
+                'assets/images/rebel_alliance/bWing.png',
+                2,
+                0
+            ),
+            new Ship(
+                'H6 Bomber',
+                'assets/images/rebel_alliance/h6Bomber.png',
+                2,
+                0
+            ),
+            new Ship(
+                'GR Transport',
+                'assets/images/rebel_alliance/grTransport.png',
+                3,
+                0
+            ),
+            new Ship(
+                'Hammerhead Corvette',
+                'assets/images/rebel_alliance/hammerheadCorvette.png',
+                4,
+                0
+            ),
+            new Ship(
+                'A Wing',
+                'assets/images/rebel_alliance/aWing.png',
+                1,
+                0
+            )
         ]
-    },
+    ),
+    special: new Alliance(
+        "Deathstar",
+        {
+            hit: 'rgba(184, 60, 65, 0.8)',
+            miss: 'rgba(255, 255, 255, 0.7)',
+        },
+        [
+            new Ship(
+                'Deathstar',
+                'assets/images/galactic_empire/deathstar.png',
+                100,
+                0
+            )
+        ]
+    )
 };
 
 const HIT = 'hit';
@@ -150,12 +172,12 @@ const crawlTitle = document.getElementById('crawl-title');
 const loserName = [...document.querySelectorAll('.losing-alliance-name')];
 const winnerName = [...document.querySelectorAll('.winning-alliance-name')];
 const losingShipCount = [...document.querySelectorAll('.losing-alliance-ships')];
-const crawlParagraph = document.getElementById('crawl-paragraph')
+const crawlParagraph = document.getElementById('crawl-paragraph');
 
 /*----- event listeners -----*/
 playBtn.addEventListener('click', handlePlay);
 restartBtn.addEventListener('click', handleRestartGame);
-playAgainBtn.addEventListener('click', handleRestartGame)
+playAgainBtn.addEventListener('click', handleRestartGame);
 document.querySelector('.modal-content').addEventListener('click', handleAllianceChoice);
 document.getElementById('rotate-ship').addEventListener('click', handleButtonRotate);
 document.getElementById('reset-placement').addEventListener('click', handleResetPlacement);
@@ -269,9 +291,9 @@ function renderScores(totalPlayerShips, totalComputerShips) {
 }
 
 function updateScores() {
-    const playerShipsDestroyed = getDestroyedShipCount(alliance)
+    const playerShipsDestroyed = getDestroyedShipCount(alliance);
     const totalPlayerShips = LOOKUP[alliance].ships.length;
-    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance)
+    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance);
     const totalComputerShips = LOOKUP[enemyAlliance].ships.length;
 
     score[1] = playerShipsDestroyed;
@@ -290,9 +312,9 @@ function renderModal() {
 function renderMessage(ally, hitOrMiss) {
 
     if (!game) {
-        message.innerHTML = `Welcome to the <span style="color:${LOOKUP[alliance].colors.hit};">${LOOKUP[alliance].name}</span>`
+        message.innerHTML = `Welcome to the <span style="color:${LOOKUP[alliance].colors.hit};">${LOOKUP[alliance].name}</span>`;
     } else {
-        message.innerHTML = `<span style="color:${LOOKUP[ally].colors.hit};">${turn}</span> ${hitOrMiss}`
+        message.innerHTML = `<span style="color:${LOOKUP[ally].colors.hit};">${turn}</span> ${hitOrMiss}`;
     }
 }
 
@@ -311,7 +333,7 @@ function handleAllianceChoice(e) {
     renderShipDock();
     renderButtons();
     setComputerShips();
-    renderMessage()
+    renderMessage();
 }
 
 // Handle board clicking
@@ -342,18 +364,18 @@ function computerTurn() {
     const arrayEl = playerBoard[ranRow][ranCol];
 
     if (computerTurnLog.some(arr => arr[2] === HIT)) {
-        const [lastRow, lastCol, lastHitOrMiss] = getLastHit()
+        const [lastRow, lastCol, lastHitOrMiss] = getLastHit();
         handleGuessNextCell(lastRow, lastCol);
     } else if (arrayEl === 0) {
         handleHits(ranRow, ranCol, MISS);
-        computerTurnLog.pop()
+        computerTurnLog.pop();
     } else if ((typeof arrayEl === 'string' || arrayEl instanceof String) && arrayEl !== MISS && arrayEl !== HIT) {
         handleHits(ranRow, ranCol, HIT);
     } else {
         return computerTurn();
     }
     if (turn === 'Computer') return nextTurn();
-    checkWinner()
+    checkWinner();
 }
 
 function handleGuessNextCell(rowIdx, colIdx) {
@@ -361,32 +383,32 @@ function handleGuessNextCell(rowIdx, colIdx) {
     const newRow = rowIdx + rowOffset;
     const newCol = colIdx + colOffset;
     const storeScore = [...score];
-    const lastHit = getLastHit()
+    const lastHit = getLastHit();
 
     if (isValidPosition(newRow, newCol)) {
         if (!playerBoard[newRow][newCol]) {
             handleHits(newRow, newCol, MISS);
         } else if (checkIfSurrounded(lastHit[0], lastHit[1]) && score[1] === score[1]) {
-            computerTurnLog.splice(2)
-            handleGuessNextCell(lastHit[0], lastHit[1])
+            computerTurnLog.splice(2);
+            handleGuessNextCell(lastHit[0], lastHit[1]);
         } else if (playerBoard[newRow][newCol] !== HIT && playerBoard[newRow][newCol] !== MISS) {
             handleHits(newRow, newCol, HIT);
             if (score[1] > storeScore[1]) {
-                computerTurnLog.splice(1)
+                computerTurnLog.splice(1);
             } else {
-                clearLastMisses()
+                clearLastMisses();
             }
         } else if (playerBoard[newRow][newCol] === HIT || playerBoard[newRow][newCol] === MISS) {
             if (checkIfSurrounded(lastHit[0], lastHit[1])) {
-                computerTurnLog.splice(2)
-                handleGuessNextCell(lastHit[0], lastHit[1])
+                computerTurnLog.splice(2);
+                handleGuessNextCell(lastHit[0], lastHit[1]);
             }
             handleGuessNextCell(lastHit[0], lastHit[1]);
         }
     } else {
         handleGuessNextCell(rowIdx, colIdx);
     }
-    checkWinner()
+    checkWinner();
 }
 
 function handleHits(rowIdx, colIdx, hitOrMiss) {
@@ -408,7 +430,7 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
     } else {
         computerTurnLog.push([rowIdx, colIdx, hitOrMiss]);
         if (computerTurnLog.filter(arr => arr.includes(MISS)).length >= 4) {
-            computerTurnLog.splice(1)
+            computerTurnLog.splice(1);
         }
         playerBoard[rowIdx][colIdx] = hitOrMiss;
         renderMessage(enemyAlliance, hitOrMiss);
@@ -493,7 +515,7 @@ function renderShipDock() {
         return;
     }
 
-    renderShipImage(count)
+    renderShipImage(count);
 }
 
 function renderShipImage(shipCount) {
@@ -533,8 +555,8 @@ function handleResetPlacement() {
 
 // All endgame functions
 function checkWinner() {
-    const playerShipsDestroyed = getDestroyedShipCount(alliance)
-    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance)
+    const playerShipsDestroyed = getDestroyedShipCount(alliance);
+    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance);
     let loserShipCount;
     if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
         [winner, loser] = [LOOKUP[enemyAlliance].name, LOOKUP[alliance].name];
@@ -570,19 +592,19 @@ function renderEndGameModal(arr) {
     let computerAttempts = 0;
     let playerAttempts = 0;
     playerBoard.forEach(row => {
-        computerAttempts += row.filter(elVal => elVal !== 0).length
+        computerAttempts += row.filter(elVal => elVal !== 0).length;
     });
     computerBoard.forEach(row => {
-        playerAttempts += row.filter(elVal => elVal !== 0).length
+        playerAttempts += row.filter(elVal => elVal !== 0).length;
     });
     const winAttempts = winName === LOOKUP[alliance].name ? playerAttempts : computerAttempts;
     crawlTitle.innerText = `${winName} Wins`;
     winnerName.forEach(el => {
         el.innerText = winName;
-    })
+    });
     loserName.forEach(el => {
         el.innerText = loseName;
-    })
+    });
     losingShipCount[0].innerText = loserShipCount;
     crawlParagraph.innerText = `While the ${winName} might have been victorious this time, it still took them ${winAttempts} attempts to destroy the ${loseName}'s Fleet.`;
     endGameModal.style.display = 'flex';
@@ -778,7 +800,7 @@ function checkIfSurrounded(rowIdx, colIdx) {
         if (!isValidPosition(rowIdx + arr[0], colIdx + arr[1])) return true;
         const el = playerBoard[rowIdx + arr[0]][colIdx + arr[1]];
         return el === HIT || el === MISS;
-    })
+    });
 }
 
 function resetDamageTaken() {
