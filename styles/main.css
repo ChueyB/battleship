@@ -113,6 +113,7 @@ h1 {
 #computer-board>div {
     border: 0.1vmin solid darkgrey;
     background-size: contain;
+    background-color: transparent;
 }
 
 #scores {

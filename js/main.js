@@ -1,109 +1,189 @@
+/*----- Classes -----*/
+class Faction {
+    constructor(name, colors, ships) {
+        this.name = name;
+        this.colors = colors;
+        this.ships = ships;
+    }
+
+    placeShipsOnBoard(board) {
+        this.ships.forEach(ship => {
+            this.placeShip(ship, board);
+        });
+    }
+
+    placeShip(ship, board) {
+        const rows = board.length;
+        const cols = board[0].length;
+        let placementIsValid = false;
+
+        while (!placementIsValid) {
+            const startRow = Math.floor(Math.random() * (rows - ship.hp + 1));
+            const startCol = Math.floor(Math.random() * (cols - ship.hp + 1));
+            const isVertical = Math.random() < 0.5;
+
+            let canPlace = true;
+
+            if (isVertical) {
+                for (let i = 0; i < ship.hp; i++) {
+                    if (
+                        startRow + i >= rows ||
+                        board[startRow + i][startCol] !== 0
+                    ) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+            } else {
+                for (let i = 0; i < ship.hp; i++) {
+                    if (
+                        startCol + i >= cols ||
+                        board[startRow][startCol + i] !== 0
+                    ) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+            }
+
+            if (canPlace) {
+                if (isVertical) {
+                    for (let i = 0; i < ship.hp; i++) {
+                        board[startRow + i][startCol] = ship.name;
+                    }
+                } else {
+                    for (let i = 0; i < ship.hp; i++) {
+                        board[startRow][startCol + i] = ship.name;
+                    }
+                }
+                placementIsValid = true;
+            }
+        }
+    }
+}
+
+class Ship {
+    constructor(name, img, hp) {
+        this.name = name;
+        this.img = img;
+        this.hp = hp;
+        this.damageTaken = 0;
+    }
+}
+
 /*----- constants -----*/
 const LOOKUP = {
-    galacticEmpire: {
-        name: "Galactic Empire",
-        colors: {
+    galacticEmpire: new Faction(
+        "Galactic Empire",
+        {
             hit: 'rgba(184, 60, 65, 0.8)',
             miss: 'rgba(255, 255, 255, 0.7)',
         },
-        ships: [
-            {
-                name: 'Bellator Dreadnaught',
-                img: 'assets/images/galactic_empire/bellatorDreadnaught.png',
-                hp: 3,
-                damageTaken: 0,
-            },
-            {
-                name: 'CR 90',
-                img: 'assets/images/galactic_empire/cr90.png',
-                hp: 3,
-                damageTaken: 0,
-            },
-            {
-                name: 'Imperial Freighter',
-                img: 'assets/images/galactic_empire/imperialFreighter.png',
-                hp: 3,
-                damageTaken: 0,
-            },
-            {
-                name: 'Dreadnaught Cruiser',
-                img: 'assets/images/galactic_empire/dreadnaughtCruiser.png',
-                hp: 6,
-                damageTaken: 0,
-            },
-            {
-                name: 'Tie Fighter',
-                img: 'assets/images/galactic_empire/tieFighter.png',
-                hp: 1,
-                damageTaken: 0,
-            },
-        ],
-    },
-    rebelAlliance: {
-        name: "Rebel Alliance",
-        colors: {
+        [
+            new Ship(
+                'Bellator Dreadnaught',
+                'assets/images/galactic_empire/bellatorDreadnaught.png',
+                3
+            ),
+            new Ship(
+                'CR 90',
+                'assets/images/galactic_empire/cr90.png',
+                3
+            ),
+            new Ship(
+                'Imperial Freighter',
+                'assets/images/galactic_empire/imperialFreighter.png',
+                3
+            ),
+            new Ship(
+                'Dreadnaught Cruiser',
+                'assets/images/galactic_empire/dreadnaughtCruiser.png',
+                6
+            ),
+            new Ship(
+                'Tie Fighter',
+                'assets/images/galactic_empire/tieFighter.png',
+                1
+            )
+        ]),
+    rebelAlliance: new Faction(
+        "Rebel Alliance",
+        {
             hit: 'rgba(32, 80, 131, 0.8)',
             miss: 'rgba(255, 255, 255, 0.7)',
         },
-        ships: [
-            {
-                name: 'X Wing',
-                img: 'assets/images/rebel_alliance/xWing.png',
-                hp: 1,
-                damageTaken: 0,
-            },
-            {
-                name: 'Y Wing',
-                img: 'assets/images/rebel_alliance/yWing.png',
-                hp: 2,
-                damageTaken: 0,
-            },
-            {
-                name: 'B Wing',
-                img: 'assets/images/rebel_alliance/bWing.png',
-                hp: 2,
-                damageTaken: 0,
-            },
-            {
-                name: 'H6 Bomber',
-                img: 'assets/images/rebel_alliance/h6Bomber.png',
-                hp: 2,
-                damageTaken: 0,
-            },
-            {
-                name: 'GR Transport',
-                img: 'assets/images/rebel_alliance/grTransport.png',
-                hp: 3,
-                damageTaken: 0,
-            },
-            {
-                name: 'Hammerhead Corvette',
-                img: 'assets/images/rebel_alliance/hammerheadCorvette.png',
-                hp: 4,
-                damageTaken: 0,
-            },
-            {
-                name: 'A Wing',
-                img: 'assets/images/rebel_alliance/aWing.png',
-                hp: 1,
-                damageTaken: 0,
-            },
-        ],
-    },
-    special: {
-        ships: [
-            {
-                name: 'Deathstar',
-                img: 'assets/images/galactic_empire/deathstar.png',
-                hp: 100,
-                damageTaken: 0,
-            },
+        [
+            new Ship(
+                'X Wing',
+                'assets/images/rebel_alliance/xWing.png',
+                1
+            ),
+            new Ship(
+                'Y Wing',
+                'assets/images/rebel_alliance/yWing.png',
+                2
+            ),
+            new Ship(
+                'B Wing',
+                'assets/images/rebel_alliance/bWing.png',
+                2
+            ),
+            new Ship(
+                'H6 Bomber',
+                'assets/images/rebel_alliance/h6Bomber.png',
+                2
+            ),
+            new Ship(
+                'GR Transport',
+                'assets/images/rebel_alliance/grTransport.png',
+                3
+            ),
+            new Ship(
+                'Hammerhead Corvette',
+                'assets/images/rebel_alliance/hammerheadCorvette.png',
+                4
+            ),
+            new Ship(
+                'A Wing',
+                'assets/images/rebel_alliance/aWing.png',
+                1
+            )
         ]
-    },
+    ),
+    special: new Faction(
+        "Deathstar",
+        {
+            hit: 'rgba(184, 60, 65, 0.8)',
+            miss: 'rgba(255, 255, 255, 0.7)',
+        },
+        [
+            new Ship(
+                'Deathstar',
+                'assets/images/galactic_empire/deathstar.png',
+                100,
+                0
+            )
+        ]
+    )
+};
+
+const LOOKUP_STYLES = {
+    GRID: 'grid',
+    NONE: 'none',
+    FLEX: 'flex',
+    ABS: 'absolute',
+    TRANS: 'transparent',
+    PREPGRID: '2 / 3',
+    GAMEGRID: '3 / 4',
+    DEG0: '0deg',
+    DEG90: '90deg'
 };
 
 const HIT = 'hit';
 const MISS = 'miss';
+const PLAYER = 'Player';
+const COMPUTER = 'Computer';
+
 const DIRECTIONS = [
     [0, -1],
     [0, 1],
@@ -120,8 +200,8 @@ let game;
 let winner;
 let loser;
 let score;
-let alliance;
-let enemyAlliance;
+let faction;
+let enemyFaction;
 let playerBoard;
 let computerBoard;
 let dragged;
@@ -147,16 +227,16 @@ const restartBtn = document.getElementById('restart-btn');
 const playAgainBtn = document.getElementById('play-again');
 const titleSection = document.getElementById('title');
 const crawlTitle = document.getElementById('crawl-title');
-const loserName = [...document.querySelectorAll('.losing-alliance-name')];
-const winnerName = [...document.querySelectorAll('.winning-alliance-name')];
-const losingShipCount = [...document.querySelectorAll('.losing-alliance-ships')];
-const crawlParagraph = document.getElementById('crawl-paragraph')
+const loserName = [...document.querySelectorAll('.losing-faction-name')];
+const winnerName = [...document.querySelectorAll('.winning-faction-name')];
+const losingShipCount = [...document.querySelectorAll('.losing-faction-ships')];
+const crawlParagraph = document.getElementById('crawl-paragraph');
 
 /*----- event listeners -----*/
 playBtn.addEventListener('click', handlePlay);
 restartBtn.addEventListener('click', handleRestartGame);
-playAgainBtn.addEventListener('click', handleRestartGame)
-document.querySelector('.modal-content').addEventListener('click', handleAllianceChoice);
+playAgainBtn.addEventListener('click', handleRestartGame);
+document.querySelector('.modal-content').addEventListener('click', handleFactionChoice);
 document.getElementById('rotate-ship').addEventListener('click', handleButtonRotate);
 document.getElementById('reset-placement').addEventListener('click', handleResetPlacement);
 shipDockIMGEls.addEventListener('dragstart', handleDragStart);
@@ -169,26 +249,30 @@ computerBoardEl.addEventListener('click', handleClickingEnemyBoard);
 init();
 
 function init() {
-    alliance = null;
-    enemyAlliance = null;
+    faction = null;
+    enemyFaction = null;
     winner = null;
     loser = null;
     score = [0, 0];
-    game = false;
+    game = 0;
     dragged = null;
     rotated = false;
     computerTurnLog = [[0, 0, 0]];
     playerBoard = [];
     computerBoard = [];
-    turn = 'Player';
+    turn = PLAYER;
 
     render();
 }
 
 function render() {
+    renderButtons();
     renderModal();
     renderComputerBoard();
     renderPlayerBoard();
+    renderMessage();
+    handleResetPlacement();
+    renderShipDock();
 }
 
 function renderComputerBoard() {
@@ -197,7 +281,7 @@ function renderComputerBoard() {
 
 function renderPlayerBoard() {
     playerBoard = createBoards(10, 10);
-    playerBoardEl.style.gridColumn = '2 / 3';
+    playerBoardEl.style.gridColumn = LOOKUP_STYLES.PREPGRID;
 }
 
 function playMusic() {
@@ -218,24 +302,24 @@ function createBoards(rows, cols) {
 function handlePlay() {
     if (shipDockIMGEls.childElementCount >= 1) return;
 
-    computerBoardEl.style.display = 'grid';
-    shipDock.style.display = 'none';
-    instructions.style.display = 'none';
-    playerBoardEl.style.gridColumn = '3 / 4';
+    computerBoardEl.style.display = LOOKUP_STYLES.GRID;
+    shipDock.style.display = LOOKUP_STYLES.NONE;
+    instructions.style.display = LOOKUP_STYLES.NONE;
+    playerBoardEl.style.gridColumn = LOOKUP_STYLES.GAMEGRID;
 
-    game = 1;
+    game = 2;
     updateScores();
     renderButtons();
     playMusic();
 }
 
-function handleRestartGame(g) {
-    computerBoardEl.style.display = 'none';
-    shipDock.style.display = 'grid';
-    instructions.style.display = 'flex';
-    playerBoardEl.style.gridColumn = '2 / 4';
-    scoresEl.style.display = 'none';
-    endGameModal.style.display = 'none';
+function handleRestartGame() {
+    computerBoardEl.style.display = LOOKUP_STYLES.NONE;
+    shipDock.style.display = LOOKUP_STYLES.GRID;
+    instructions.style.display = LOOKUP_STYLES.FLEX;
+    playerBoardEl.style.gridColumn = '2 / 3';
+    scoresEl.style.display = LOOKUP_STYLES.NONE;
+    endGameModal.style.display = LOOKUP_STYLES.NONE;
 
     game = 0;
     computerTurnLog.length = 0;
@@ -245,22 +329,22 @@ function handleRestartGame(g) {
 }
 
 function renderButtons() {
-    if (game === 2) {
-        playBtn.style.display = 'none';
-        restartBtn.style.display = 'none';
-    } else if (game === 1) {
-        playBtn.style.display = 'none';
-        restartBtn.style.display = 'grid';
+    if (!game) {
+        playBtn.style.display = LOOKUP_STYLES.NONE;
+        restartBtn.style.display = LOOKUP_STYLES.NONE;
+    } else if (game === 2) {
+        playBtn.style.display = LOOKUP_STYLES.NONE;
+        restartBtn.style.display = LOOKUP_STYLES.GRID;
     } else {
-        playBtn.style.display = 'grid';
-        restartBtn.style.display = 'none';
+        playBtn.style.display = LOOKUP_STYLES.GRID;
+        restartBtn.style.display = LOOKUP_STYLES.NONE;
     }
 }
 
 function renderScores(totalPlayerShips, totalComputerShips) {
-    scoresEl.style.display = 'grid';
-    scoresEl.children[0].style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
-    scoresEl.children[1].style.backgroundColor = LOOKUP[alliance].colors.hit;
+    scoresEl.style.display = LOOKUP_STYLES.GRID;
+    scoresEl.children[0].style.backgroundColor = LOOKUP[enemyFaction].colors.hit;
+    scoresEl.children[1].style.backgroundColor = LOOKUP[faction].colors.hit;
 
     if (game !== 0) {
         scoresEl.firstElementChild.innerText = `${score[0] || 0} / ${totalComputerShips}`;
@@ -269,10 +353,10 @@ function renderScores(totalPlayerShips, totalComputerShips) {
 }
 
 function updateScores() {
-    const playerShipsDestroyed = getDestroyedShipCount(alliance)
-    const totalPlayerShips = LOOKUP[alliance].ships.length;
-    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance)
-    const totalComputerShips = LOOKUP[enemyAlliance].ships.length;
+    const playerShipsDestroyed = getDestroyedShipCount(faction);
+    const totalPlayerShips = LOOKUP[faction].ships.length;
+    const computerShipsDestroyed = getDestroyedShipCount(enemyFaction);
+    const totalComputerShips = LOOKUP[enemyFaction].ships.length;
 
     score[1] = playerShipsDestroyed;
     score[0] = computerShipsDestroyed;
@@ -281,52 +365,50 @@ function updateScores() {
 }
 
 function renderModal() {
-    modal.style.display = 'flex';
-    playerBoardEl.style.display = 'none';
+    if (game > 0) return;
+    modal.style.display = LOOKUP_STYLES.FLEX;
+    playerBoardEl.style.display = LOOKUP_STYLES.NONE;
     shipDockIMGEls.innerHTML = '';
-    handleResetPlacement();
 }
 
 function renderMessage(ally, hitOrMiss) {
 
-    if (!game) {
-        message.innerHTML = `Welcome to the <span style="color:${LOOKUP[alliance].colors.hit};">${LOOKUP[alliance].name}</span>`
-    } else {
-        message.innerHTML = `<span style="color:${LOOKUP[ally].colors.hit};">${turn}</span> ${hitOrMiss}`
+    if (game === 1) {
+        message.innerHTML = `Welcome to the <span style="color:${LOOKUP[faction].colors.hit};">${LOOKUP[faction].name}</span>`;
+    } else if (game === 2) {
+        message.innerHTML = `<span style="color:${LOOKUP[ally].colors.hit};">${turn}</span> ${hitOrMiss}`;
     }
 }
 
-// Handles alliance choice at the start of game
-function handleAllianceChoice(e) {
+// Handles faction choice at the start of game
+function handleFactionChoice(e) {
     if (e.target.tagName !== 'IMG') return;
 
-    alliance = e.target.id;
-    enemyAlliance = getEnemyAlliance(alliance);
-    enemyShipArray = LOOKUP[enemyAlliance].ships;
-    playerShipArray = LOOKUP[alliance].ships;
-    modal.style.display = 'none';
-    playerBoardEl.style.display = 'grid';
-    titleSection.style.display = 'grid';
-    game = 0;
-    renderShipDock();
-    renderButtons();
-    setComputerShips();
-    renderMessage()
+    faction = e.target.id;
+    enemyFaction = getEnemyFaction(faction);
+    enemyShipArray = LOOKUP[enemyFaction].ships;
+    playerShipArray = LOOKUP[faction].ships;
+    modal.style.display = LOOKUP_STYLES.NONE;
+    playerBoardEl.style.display = LOOKUP_STYLES.GRID;
+    titleSection.style.display = LOOKUP_STYLES.GRID;
+    game = 1;
+    render();
+    LOOKUP[enemyFaction].placeShipsOnBoard(computerBoard);
 }
 
 // Handle board clicking
 function handleClickingEnemyBoard(e) {
-    if (e.target.tagName !== 'DIV' || !game || turn === 'Computer') return;
+    if (e.target.tagName !== 'DIV' || !game || turn === COMPUTER) return;
     const [rowIdx, colIdx] = e.target.id.split('-');
     const boardCell = computerBoard[rowIdx - 1][colIdx - 1];
 
     if (boardCell === HIT || boardCell === MISS) return;
 
     if (boardCell) {
-        e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.hit;
+        e.target.style.backgroundColor = LOOKUP[enemyFaction].colors.hit;
         handleHits(rowIdx - 1, colIdx - 1, HIT);
     } else {
-        e.target.style.backgroundColor = LOOKUP[enemyAlliance].colors.miss;
+        e.target.style.backgroundColor = LOOKUP[enemyFaction].colors.miss;
         handleHits(rowIdx - 1, colIdx - 1, MISS);
     }
 
@@ -336,24 +418,29 @@ function handleClickingEnemyBoard(e) {
 }
 
 function computerTurn() {
-    if (turn === 'Player') return;
+    if (turn === PLAYER) return;
 
     const [ranRow, ranCol] = getRandomPosition();
     const arrayEl = playerBoard[ranRow][ranCol];
 
     if (computerTurnLog.some(arr => arr[2] === HIT)) {
-        const [lastRow, lastCol, lastHitOrMiss] = getLastHit()
+        const [lastRow, lastCol, _] = getLastHit();
         handleGuessNextCell(lastRow, lastCol);
     } else if (arrayEl === 0) {
         handleHits(ranRow, ranCol, MISS);
-        computerTurnLog.pop()
-    } else if ((typeof arrayEl === 'string' || arrayEl instanceof String) && arrayEl !== MISS && arrayEl !== HIT) {
+        computerTurnLog.pop();
+    } else if ((
+        typeof arrayEl === 'string'
+        || arrayEl instanceof String)
+        && arrayEl !== MISS
+        && arrayEl !== HIT
+    ) {
         handleHits(ranRow, ranCol, HIT);
     } else {
         return computerTurn();
     }
-    if (turn === 'Computer') return nextTurn();
-    checkWinner()
+    if (turn === COMPUTER) return nextTurn();
+    checkWinner();
 }
 
 function handleGuessNextCell(rowIdx, colIdx) {
@@ -361,39 +448,41 @@ function handleGuessNextCell(rowIdx, colIdx) {
     const newRow = rowIdx + rowOffset;
     const newCol = colIdx + colOffset;
     const storeScore = [...score];
-    const lastHit = getLastHit()
+    const lastHit = getLastHit();
 
     if (isValidPosition(newRow, newCol)) {
         if (!playerBoard[newRow][newCol]) {
             handleHits(newRow, newCol, MISS);
         } else if (checkIfSurrounded(lastHit[0], lastHit[1]) && score[1] === score[1]) {
-            computerTurnLog.splice(2)
-            handleGuessNextCell(lastHit[0], lastHit[1])
+            computerTurnLog.splice(2);
+            handleGuessNextCell(lastHit[0], lastHit[1]);
         } else if (playerBoard[newRow][newCol] !== HIT && playerBoard[newRow][newCol] !== MISS) {
             handleHits(newRow, newCol, HIT);
             if (score[1] > storeScore[1]) {
-                computerTurnLog.splice(1)
+                computerTurnLog.splice(1);
             } else {
-                clearLastMisses()
+                clearLastMisses();
             }
         } else if (playerBoard[newRow][newCol] === HIT || playerBoard[newRow][newCol] === MISS) {
             if (checkIfSurrounded(lastHit[0], lastHit[1])) {
-                computerTurnLog.splice(2)
-                handleGuessNextCell(lastHit[0], lastHit[1])
+                computerTurnLog.splice(2);
+                handleGuessNextCell(lastHit[0], lastHit[1]);
             }
             handleGuessNextCell(lastHit[0], lastHit[1]);
         }
     } else {
         handleGuessNextCell(rowIdx, colIdx);
     }
-    checkWinner()
+    checkWinner();
 }
 
 function handleHits(rowIdx, colIdx, hitOrMiss) {
-    const nameOfShip = turn === 'Player' ? computerBoard[rowIdx][colIdx] : playerBoard[rowIdx][colIdx];
-    const currentEnemyAlliance = turn === 'Player' ? enemyAlliance : alliance;
-    const currentCells = turn === 'Player' ? computerCells : playerCells;
-    const currentEnemyShip = LOOKUP[currentEnemyAlliance].ships.find(
+    const nameOfShip = turn === PLAYER
+        ? computerBoard[rowIdx][colIdx]
+        : playerBoard[rowIdx][colIdx];
+    const currentEnemyFaction = turn === PLAYER ? enemyFaction : faction;
+    const currentCells = turn === PLAYER ? computerCells : playerCells;
+    const currentEnemyShip = LOOKUP[currentEnemyFaction].ships.find(
         (ship) => ship.name === nameOfShip
     );
 
@@ -401,18 +490,18 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
         (cell) => cell.id === `${rowIdx + 1}-${colIdx + 1}`
     );
 
-    if (turn === 'Player') {
+    if (turn === PLAYER) {
         computerBoard[rowIdx][colIdx] = hitOrMiss;
-        renderMessage(alliance, hitOrMiss);
-        cellEl.style.backgroundColor = LOOKUP[enemyAlliance].colors[hitOrMiss];
+        renderMessage(faction, hitOrMiss);
+        cellEl.style.backgroundColor = LOOKUP[enemyFaction].colors[hitOrMiss];
     } else {
         computerTurnLog.push([rowIdx, colIdx, hitOrMiss]);
         if (computerTurnLog.filter(arr => arr.includes(MISS)).length >= 4) {
-            computerTurnLog.splice(1)
+            computerTurnLog.splice(1);
         }
         playerBoard[rowIdx][colIdx] = hitOrMiss;
-        renderMessage(enemyAlliance, hitOrMiss);
-        cellEl.style.backgroundColor = LOOKUP[alliance].colors[hitOrMiss];
+        renderMessage(enemyFaction, hitOrMiss);
+        cellEl.style.backgroundColor = LOOKUP[faction].colors[hitOrMiss];
     }
 
     if (!nameOfShip) return;
@@ -420,127 +509,70 @@ function handleHits(rowIdx, colIdx, hitOrMiss) {
     updateScores();
 }
 
-// Set Computer Board Ship Locations
-function setComputerShips() {
-    const enemyShips = LOOKUP[enemyAlliance].ships;
-    const rows = computerBoard.length;
-    const cols = computerBoard[0].length;
-
-    enemyShips.forEach((ship) => {
-        let placementIsValid = false;
-
-        while (!placementIsValid) {
-            const startRow = Math.floor(Math.random() * (rows - ship.hp + 1));
-            const startCol = Math.floor(Math.random() * (cols - ship.hp + 1));
-            const isVertical = Math.random() < 0.5;
-
-            let canPlace = true;
-
-            if (isVertical) {
-                for (let i = 0; i < ship.hp; i++) {
-                    if (
-                        startRow + i >= rows ||
-                        computerBoard[startRow + i][startCol] !== 0
-                    ) {
-                        canPlace = false;
-                        break;
-                    }
-                }
-            } else {
-                for (let i = 0; i < ship.hp; i++) {
-                    if (
-                        startCol + i >= cols ||
-                        computerBoard[startRow][startCol + i] !== 0
-                    ) {
-                        canPlace = false;
-                        break;
-                    }
-                }
-            }
-
-            if (canPlace) {
-                if (isVertical) {
-                    for (let i = 0; i < ship.hp; i++) {
-                        computerBoard[startRow + i][startCol] = ship.name;
-                    }
-                } else {
-                    for (let i = 0; i < ship.hp; i++) {
-                        computerBoard[startRow][startCol + i] = ship.name;
-                    }
-                }
-                placementIsValid = true;
-            }
-        }
-    });
-}
-
 // handles all pre-game ship functions
-
 function renderShipDock() {
-    if (!alliance) return;
+    if (!faction || game === 0) return;
 
-    shipDock.style.display = 'grid';
+    shipDock.style.display = LOOKUP_STYLES.GRID;
     let count = playerCells.filter(
         (cell) => cell.childElementCount >= 1
     ).length;
 
-    renderShipName(LOOKUP[alliance].ships[count]);
+    renderShipName(LOOKUP[faction].ships[count]);
 
     if (
-        (alliance === 'galacticEmpire' && count > 4) ||
-        (alliance === 'rebelAlliance' && count > 6)
+        (faction === 'galacticEmpire' && count > 4) ||
+        (faction === 'rebelAlliance' && count > 6)
     ) {
         return;
     }
 
-    renderShipImage(count)
+    renderShipImage(count);
 }
 
 function renderShipImage(shipCount) {
     const newIMG = document.createElement('img');
     newIMG.classList.add('ship-image');
-    newIMG.id = `${alliance}-${Math.abs(shipCount)}-${LOOKUP[alliance].ships[shipCount].name
+    newIMG.id = `${faction}-${Math.abs(shipCount)}-${LOOKUP[faction].ships[shipCount].name
         }`;
-    newIMG.src = LOOKUP[alliance].ships[shipCount].img;
+    newIMG.src = LOOKUP[faction].ships[shipCount].img;
     shipDockIMGEls.appendChild(newIMG);
 }
 
 function handleButtonRotate() {
-    if (shipDockIMGEls.firstElementChild.style.rotate === '0deg') {
-        shipDockIMGEls.firstElementChild.style.rotate = '90deg';
+    if (shipDockIMGEls.firstElementChild.style.rotate === LOOKUP_STYLES.DEG0) {
+        shipDockIMGEls.firstElementChild.style.rotate = LOOKUP_STYLES.DEG90;
         rotated = true;
     } else {
-        shipDockIMGEls.firstElementChild.style.rotate = '0deg';
+        shipDockIMGEls.firstElementChild.style.rotate = LOOKUP_STYLES.DEG0;
         rotated = false;
     }
 }
 
 function handleResetPlacement() {
+    if (game === 0) return;
     playerCells.forEach(function (cell) {
         cell.innerHTML = '';
-        cell.style.backgroundColor = 'transparent';
+        cell.style.backgroundColor = LOOKUP_STYLES.TRANS;
     });
     computerCells.forEach(function (cell) {
         cell.innerHTML = '';
-        cell.style.backgroundColor = 'transparent';
+        cell.style.backgroundColor = LOOKUP_STYLES.TRANS;
     });
     shipDockIMGEls.innerHTML = '';
     rotated = false;
-
-    renderPlayerBoard();
-    renderShipDock();
 }
 
 // All endgame functions
 function checkWinner() {
-    const playerShipsDestroyed = getDestroyedShipCount(alliance)
-    const computerShipsDestroyed = getDestroyedShipCount(enemyAlliance)
+    const playerShipsDestroyed = getDestroyedShipCount(faction);
+    const computerShipsDestroyed = getDestroyedShipCount(enemyFaction);
     let loserShipCount;
-    if (playerShipsDestroyed === LOOKUP[alliance].ships.length) {
-        [winner, loser] = [LOOKUP[enemyAlliance].name, LOOKUP[alliance].name];
+    if (playerShipsDestroyed === LOOKUP[faction].ships.length) {
+        [winner, loser] = [LOOKUP[enemyFaction].name, LOOKUP[faction].name];
         loserShipCount = playerShipsDestroyed;
-    } else if (computerShipsDestroyed === LOOKUP[enemyAlliance].ships.length) {
-        [winner, loser] = [LOOKUP[alliance].name, LOOKUP[enemyAlliance].name];
+    } else if (computerShipsDestroyed === LOOKUP[enemyFaction].ships.length) {
+        [winner, loser] = [LOOKUP[faction].name, LOOKUP[enemyFaction].name];
         loserShipCount = computerShipsDestroyed;
     }
     if (winner) {
@@ -549,16 +581,16 @@ function checkWinner() {
 }
 
 function endGame(arr) {
-    computerBoardEl.style.display = 'none';
-    shipDock.style.display = 'none';
-    instructions.style.display = 'none';
-    scoresEl.style.display = 'none';
-    modal.style.display = 'none';
-    playerBoardEl.style.display = 'none';
+    computerBoardEl.style.display = LOOKUP_STYLES.NONE;
+    shipDock.style.display = LOOKUP_STYLES.NONE;
+    instructions.style.display = LOOKUP_STYLES.NONE;
+    scoresEl.style.display = LOOKUP_STYLES.NONE;
+    modal.style.display = LOOKUP_STYLES.NONE;
+    playerBoardEl.style.display = LOOKUP_STYLES.NONE;
     shipDockIMGEls.innerHTML = '';
-    titleSection.style.display = 'none';
+    titleSection.style.display = LOOKUP_STYLES.NONE;
 
-    game = 2;
+    game = 0;
     resetDamageTaken();
     renderButtons();
     stopMusic();
@@ -570,29 +602,29 @@ function renderEndGameModal(arr) {
     let computerAttempts = 0;
     let playerAttempts = 0;
     playerBoard.forEach(row => {
-        computerAttempts += row.filter(elVal => elVal !== 0).length
+        computerAttempts += row.filter(elVal => elVal !== 0).length;
     });
     computerBoard.forEach(row => {
-        playerAttempts += row.filter(elVal => elVal !== 0).length
+        playerAttempts += row.filter(elVal => elVal !== 0).length;
     });
-    const winAttempts = winName === LOOKUP[alliance].name ? playerAttempts : computerAttempts;
+    const winAttempts = winName === LOOKUP[faction].name ? playerAttempts : computerAttempts;
     crawlTitle.innerText = `${winName} Wins`;
     winnerName.forEach(el => {
         el.innerText = winName;
-    })
+    });
     loserName.forEach(el => {
         el.innerText = loseName;
-    })
+    });
     losingShipCount[0].innerText = loserShipCount;
     crawlParagraph.innerText = `While the ${winName} might have been victorious this time, it still took them ${winAttempts} attempts to destroy the ${loseName}'s Fleet.`;
-    endGameModal.style.display = 'flex';
+    endGameModal.style.display = LOOKUP_STYLES.FLEX;
 }
 
 // Properly place the image into the grid
 function imageIntoGrid(e) {
     const { matchingCells } = getShipHoverLength(e);
-    const [allianceName, shipID, shipName] = dragged.id.split('-');
-    const shipHealth = LOOKUP[allianceName].ships[shipID].hp;
+    const [factionName, shipID, shipName] = dragged.id.split('-');
+    const shipHealth = LOOKUP[factionName].ships[shipID].hp;
 
     const [getRow, getCol] = matchingCells[0].id.split('-');
     const cellWidth = matchingCells[0].clientWidth;
@@ -600,7 +632,7 @@ function imageIntoGrid(e) {
     const imgWidth = cellWidth * shipHealth;
     const imgHeight = cellHeight;
 
-    dragged.style.position = 'absolute';
+    dragged.style.position = LOOKUP_STYLES.ABS;
     dragged.style.width = `${imgWidth}px`;
     dragged.style.height = `${imgHeight}px`;
     if (rotated) {
@@ -611,8 +643,8 @@ function imageIntoGrid(e) {
 
 function getShipHoverLength(e) {
     const divEls = e.target.id.split('-');
-    const [allianceName, shipID, shipName] = dragged.id.split('-');
-    const hp = LOOKUP[allianceName].ships[shipID].hp;
+    const [factionName, shipID, shipName] = dragged.id.split('-');
+    const hp = LOOKUP[factionName].ships[shipID].hp;
     const row = parseInt(divEls[0]);
     const col = parseInt(divEls[1]);
     const parentAndIndex = [];
@@ -655,8 +687,8 @@ function cellColorOnHover(e) {
     const { parentAndIndex } = getShipHoverLength(e);
     const backgroundColor =
         e.type === 'dragleave' || e.type === 'drop'
-            ? 'transparent'
-            : LOOKUP[alliance].colors.hit;
+            ? LOOKUP_STYLES.TRANS
+            : LOOKUP[faction].colors.hit;
     parentAndIndex.forEach((cell) => {
         const hoveredCells = playerCells[cell.index];
         hoveredCells.style.backgroundColor = backgroundColor;
@@ -665,8 +697,8 @@ function cellColorOnHover(e) {
 }
 
 function getShipLength(e) {
-    const [chosenAlliance, shipIdx] = e.id.split('-');
-    return LOOKUP[chosenAlliance].ships[`${shipIdx}`].hp;
+    const [chosenFaction, shipIdx] = e.id.split('-');
+    return LOOKUP[chosenFaction].ships[`${shipIdx}`].hp;
 }
 
 function handleArrayPlacement(obj) {
@@ -758,19 +790,19 @@ function getRandomPosition() {
 }
 
 function nextTurn() {
-    turn = turn === 'Player' ? 'Computer' : 'Player';
+    turn = turn === PLAYER ? COMPUTER : PLAYER;
 }
 
-function getEnemyAlliance(ally) {
-    const enemyAlliance = Object.keys(LOOKUP).filter(
+function getEnemyFaction(ally) {
+    const enemyFaction = Object.keys(LOOKUP).filter(
         (key) => key !== 'special' && key !== ally
     );
 
-    return enemyAlliance;
+    return enemyFaction;
 }
 
-function getDestroyedShipCount(allianceVar) {
-    return LOOKUP[allianceVar].ships.filter((ship) => ship.damageTaken === ship.hp).length;
+function getDestroyedShipCount(factionVar) {
+    return LOOKUP[factionVar].ships.filter((ship) => ship.damageTaken === ship.hp).length;
 }
 
 function checkIfSurrounded(rowIdx, colIdx) {
@@ -778,11 +810,12 @@ function checkIfSurrounded(rowIdx, colIdx) {
         if (!isValidPosition(rowIdx + arr[0], colIdx + arr[1])) return true;
         const el = playerBoard[rowIdx + arr[0]][colIdx + arr[1]];
         return el === HIT || el === MISS;
-    })
+    });
 }
 
 function resetDamageTaken() {
-    [LOOKUP[alliance].ships, LOOKUP[enemyAlliance].ships].forEach(shipsArray => {
+    if (game > 0) return;
+    [LOOKUP[faction].ships, LOOKUP[enemyFaction].ships].forEach(shipsArray => {
         shipsArray.forEach(ship => {
             ship.damageTaken = 0;
         });
