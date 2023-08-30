@@ -63,11 +63,17 @@ class Faction {
 }
 
 class Ship {
-    constructor(name, img, hp) {
+    constructor(name, hp, faction) {
         this.name = name;
-        this.img = img;
+        this.img = this.shipPath(name, faction);
         this.hp = hp;
+        this.faction = faction;
         this.damageTaken = 0;
+    }
+
+    shipPath(name, faction) {
+        const cameledName = toCamelCase(name);
+        return `assets/images/${faction}/${cameledName}.png`;
     }
 }
 
@@ -80,31 +86,11 @@ const LOOKUP = {
             miss: 'rgba(255, 255, 255, 0.7)',
         },
         [
-            new Ship(
-                'Bellator Dreadnaught',
-                'assets/images/galactic_empire/bellatorDreadnaught.png',
-                3
-            ),
-            new Ship(
-                'CR 90',
-                'assets/images/galactic_empire/cr90.png',
-                3
-            ),
-            new Ship(
-                'Imperial Freighter',
-                'assets/images/galactic_empire/imperialFreighter.png',
-                3
-            ),
-            new Ship(
-                'Dreadnaught Cruiser',
-                'assets/images/galactic_empire/dreadnaughtCruiser.png',
-                6
-            ),
-            new Ship(
-                'Tie Fighter',
-                'assets/images/galactic_empire/tieFighter.png',
-                1
-            )
+            new Ship('Bellator Dreadnaught', 3, 'galacticEmpire'),
+            new Ship('CR 90', 3, 'galacticEmpire'),
+            new Ship('Imperial Freighter', 3, 'galacticEmpire'),
+            new Ship('Dreadnaught Cruiser', 6, 'galacticEmpire'),
+            new Ship('Tie Fighter', 1, 'galacticEmpire')
         ]),
     rebelAlliance: new Faction(
         "Rebel Alliance",
@@ -113,41 +99,13 @@ const LOOKUP = {
             miss: 'rgba(255, 255, 255, 0.7)',
         },
         [
-            new Ship(
-                'X Wing',
-                'assets/images/rebel_alliance/xWing.png',
-                1
-            ),
-            new Ship(
-                'Y Wing',
-                'assets/images/rebel_alliance/yWing.png',
-                2
-            ),
-            new Ship(
-                'B Wing',
-                'assets/images/rebel_alliance/bWing.png',
-                2
-            ),
-            new Ship(
-                'H6 Bomber',
-                'assets/images/rebel_alliance/h6Bomber.png',
-                2
-            ),
-            new Ship(
-                'GR Transport',
-                'assets/images/rebel_alliance/grTransport.png',
-                3
-            ),
-            new Ship(
-                'Hammerhead Corvette',
-                'assets/images/rebel_alliance/hammerheadCorvette.png',
-                4
-            ),
-            new Ship(
-                'A Wing',
-                'assets/images/rebel_alliance/aWing.png',
-                1
-            )
+            new Ship('X Wing', 1, 'rebelAlliance'),
+            new Ship('Y Wing', 2, 'rebelAlliance'),
+            new Ship('B Wing', 2, 'rebelAlliance'),
+            new Ship('H6 Bomber', 2, 'rebelAlliance'),
+            new Ship('GR Transport', 3, 'rebelAlliance'),
+            new Ship('Hammerhead Corvette', 4, 'rebelAlliance'),
+            new Ship('A Wing', 1, 'rebelAlliance')
         ]
     ),
     special: new Faction(
@@ -159,9 +117,8 @@ const LOOKUP = {
         [
             new Ship(
                 'Deathstar',
-                'assets/images/galactic_empire/deathstar.png',
-                100,
-                0
+                'assets/images/galacticEmpire/deathstar.png',
+                100
             )
         ]
     )
@@ -353,6 +310,7 @@ function renderScores(totalPlayerShips, totalComputerShips) {
 }
 
 function updateScores() {
+    if (game === 0) return;
     const playerShipsDestroyed = getDestroyedShipCount(faction);
     const totalPlayerShips = LOOKUP[faction].ships.length;
     const computerShipsDestroyed = getDestroyedShipCount(enemyFaction);
@@ -820,4 +778,18 @@ function resetDamageTaken() {
             ship.damageTaken = 0;
         });
     });
+}
+
+function toCamelCase(input) {
+    const words = input.split(' ');
+
+    for (let i = 0; i < words.length; i++) {
+        if (i === 0) {
+            words[i] = words[i].toLowerCase();
+        } else {
+            words[i] = words[i][0].toUpperCase() + words[i].slice(1).toLowerCase();
+        }
+    }
+
+    return words.join('');
 }

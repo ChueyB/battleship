@@ -6,9 +6,9 @@
 
 <div align="center" id="header">
    
-# Battleship
+# Battle Starship
 **Created by [Jesus Barrientos](https://www.linkedin.com/in/barrientosjesus/)**
-#### [CLICK TO PLAY BATTLESHIP](https://chueyb.github.io/battleship/) 
+#### [CLICK TO PLAY BATTLE STARSHIP](https://chueyb.github.io/battleship/) 
 
 </div>
 
@@ -28,7 +28,7 @@ This is the childhood game of Battleship with a Star Wars twist. Fight for the E
 # Screenshot
 | Description | Screenshot |
 |------------ | ------------|
-| <h3 align="center">Alliance Choice</h3> | <img src="https://i.imgur.com/RUf3tvr.jpeg">
+| <h3 align="center">Faction Choice</h3> | <img src="https://i.imgur.com/RUf3tvr.jpeg">
 | <h3 align="center">Ship Placement</h3> | <img src="https://i.imgur.com/a6BSQgV.jpg">
 | <h3 align="center">In Progress</h3> | <img src="https://i.imgur.com/ZL24YFD.jpg">
 
@@ -42,7 +42,7 @@ This is the childhood game of Battleship with a Star Wars twist. Fight for the E
 <details open>
 <summary>How to Play</summary>
  
-1. Select your Alliance. (Choosing between Galactic Empire and Rebel Alliance) 
+1. Select your Faction. (Choosing between Galactic Empire and Rebel Alliance) 
  
 2. Place your ships on the board.
  
@@ -60,3 +60,4 @@ This is the childhood game of Battleship with a Star Wars twist. Fight for the E
 - [ ] Make computer smarter about choice
 - [ ] Add rotate ship to scroll wheel
 - [ ] Make ships draggable after placement
+- [ ] Add Player vs Player
