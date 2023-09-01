@@ -229,7 +229,6 @@ function render() {
     renderPlayerBoard();
     renderMessage();
     handleResetPlacement();
-    renderShipDock();
 }
 
 function renderComputerBoard() {
@@ -519,6 +518,7 @@ function handleResetPlacement() {
     });
     shipDockIMGEls.innerHTML = '';
     rotated = false;
+    renderShipDock();
 }
 
 // All endgame functions
