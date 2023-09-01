@@ -157,6 +157,8 @@ let game;
 let winner;
 let loser;
 let score;
+let computerPreviousScore;
+let computerScoreChanged;
 let faction;
 let enemyFaction;
 let playerBoard;
@@ -211,10 +213,12 @@ function init() {
     winner = null;
     loser = null;
     score = [0, 0];
+    computerPreviousScore = 0;
+    computerScoreChanged = false;
     game = 0;
     dragged = null;
     rotated = false;
-    computerTurnLog = [[0, 0, 0]];
+    computerTurnLog = [];
     playerBoard = [];
     computerBoard = [];
     turn = PLAYER;
@@ -318,7 +322,10 @@ function updateScores() {
     score[1] = playerShipsDestroyed;
     score[0] = computerShipsDestroyed;
 
+    handleScoreChange(score[1]);
+
     renderScores(totalPlayerShips, totalComputerShips);
+    checkWinner();
 }
 
 function renderModal() {
@@ -369,20 +376,25 @@ function handleClickingEnemyBoard(e) {
         handleHits(rowIdx - 1, colIdx - 1, MISS);
     }
 
-    checkWinner();
     nextTurn();
     setTimeout(computerTurn, 700);
 }
 
 function computerTurn() {
     if (turn === PLAYER) return;
+    console.log(computerTurnLog);
 
-    const [ranRow, ranCol] = getRandomPosition();
+    let [ranRow, ranCol] = getRandomPosition();
     const arrayEl = playerBoard[ranRow][ranCol];
 
-    if (computerTurnLog.some(arr => arr[2] === HIT)) {
+    const totalHits = getTotalHits();
+
+    if (totalHits > 2 || totalHits === 1) {
         const [lastRow, lastCol, _] = getLastHit();
         handleGuessNextCell(lastRow, lastCol);
+    } else if (totalHits === 2) {
+        const [nextRow, nextCol] = getNextIndexInDirection();
+        handleHits(nextRow, nextCol, checkCellForShip(nextRow, nextCol));
     } else if (arrayEl === 0) {
         handleHits(ranRow, ranCol, MISS);
         computerTurnLog.pop();
@@ -397,32 +409,26 @@ function computerTurn() {
         return computerTurn();
     }
     if (turn === COMPUTER) return nextTurn();
-    checkWinner();
 }
 
 function handleGuessNextCell(rowIdx, colIdx) {
     const [rowOffset, colOffset] = randomDirec();
     const newRow = rowIdx + rowOffset;
     const newCol = colIdx + colOffset;
-    const storeScore = [...score];
     const lastHit = getLastHit();
 
     if (isValidPosition(newRow, newCol)) {
         if (!playerBoard[newRow][newCol]) {
             handleHits(newRow, newCol, MISS);
-        } else if (checkIfSurrounded(lastHit[0], lastHit[1]) && score[1] === score[1]) {
-            computerTurnLog.splice(2);
-            handleGuessNextCell(lastHit[0], lastHit[1]);
+        } else if (checkIfSurrounded(lastHit[0], lastHit[1])) {
+            computerTurnLog.splice(0);
+            computerTurn();
         } else if (playerBoard[newRow][newCol] !== HIT && playerBoard[newRow][newCol] !== MISS) {
             handleHits(newRow, newCol, HIT);
-            if (score[1] > storeScore[1]) {
-                computerTurnLog.splice(1);
-            } else {
-                clearLastMisses();
-            }
+            clearLastMisses();
         } else if (playerBoard[newRow][newCol] === HIT || playerBoard[newRow][newCol] === MISS) {
             if (checkIfSurrounded(lastHit[0], lastHit[1])) {
-                computerTurnLog.splice(2);
+                computerTurnLog.splice(1);
                 handleGuessNextCell(lastHit[0], lastHit[1]);
             }
             handleGuessNextCell(lastHit[0], lastHit[1]);
@@ -430,7 +436,6 @@ function handleGuessNextCell(rowIdx, colIdx) {
     } else {
         handleGuessNextCell(rowIdx, colIdx);
     }
-    checkWinner();
 }
 
 function handleHits(rowIdx, colIdx, hitOrMiss) {
@@ -726,12 +731,118 @@ function clearLastMisses() {
 }
 
 function getLastHit() {
+    console.log('running getlasthit');
     return computerTurnLog.reduceRight((result, currentArray) => {
         if (!result && currentArray.includes(HIT)) {
             return currentArray;
         }
         return result;
     }, null);
+}
+
+function getTotalHits() {
+    console.log('running GetTotalHits');
+    return computerTurnLog.reduce((totalHits, currentArray) => {
+        if (currentArray.includes(HIT)) {
+            return totalHits + 1;
+        }
+        console.log(totalHits);
+        return totalHits;
+    }, 0);
+}
+
+function getNextIndexInDirection() {
+    console.log('start GNIID');
+    const hits = computerTurnLog.filter((arr) => arr.includes(HIT));
+    const [firstHitRow, firstHitCol, _] = hits[0];
+    const [secondHitRow, secondHitCol, __] = hits[1];
+    const rowOffset = firstHitRow === secondHitRow ? 0 : 1;
+    const colOffset = firstHitCol === secondHitCol ? 0 : 1;
+    const directionArray = checkSide(rowOffset, colOffset);
+    console.log(directionArray);
+    const lowestAndHighestRow = [Math.min(firstHitRow, secondHitRow), Math.max(firstHitRow, secondHitRow)];
+    const lowestAndHighestCol = [Math.min(firstHitCol, secondHitCol), Math.max(firstHitCol, secondHitCol)];
+    let nextRow;
+    let nextCol;
+
+    console.log('GNIID after assignments');
+
+    if (hits.length < 2) {
+        return null;
+    }
+
+    if (rowOffset === 0) {
+        nextRow = firstHitRow;
+        if (directionArray[0] || (!directionArray[0] && !directionArray[1])) {
+            nextCol = lowestAndHighestCol[1] + colOffset;
+        } else if (directionArray[1]) {
+            nextCol = lowestAndHighestCol[0] - colOffset;
+        } else {
+            console.log('going null rowoffset 0');
+            return null;
+        }
+    } else if (colOffset === 0) {
+        nextCol = firstHitCol;
+        if (directionArray[0] || (!directionArray[0] && !directionArray[1])) {
+            nextRow = lowestAndHighestRow[1] + rowOffset;
+        } else if (directionArray[1]) {
+            nextRow = lowestAndHighestRow[0] - rowOffset;
+        } else {
+            console.log('going null coloffset 0');
+            return null;
+        }
+    }
+
+    console.log(nextRow, nextCol);
+    return [nextRow, nextCol];
+}
+
+function checkSide(rowOffset, colOffset) {
+    const hits = computerTurnLog.filter((arr) => arr.includes(HIT));
+    const [firstHitRow, firstHitCol, _] = hits[0];
+    const [secondHitRow, secondHitCol, __] = hits[1];
+    const newArray = [];
+    let topLeft;
+    let bottomRight;
+
+    if (firstHitCol > secondHitCol) {
+        topLeft = secondHitCol - 1;
+        bottomRight = firstHitCol + 1;
+    } else if (firstHitCol < secondHitCol) {
+        topLeft = firstHitCol - 1;
+        bottomRight = secondHitCol + 1;
+    }
+
+    if (firstHitRow > secondHitRow) {
+        topLeft = secondHitRow - 1;
+        bottomRight = firstHitCol + 1;
+    } else if (firstHitRow < secondHitRow) {
+        topLeft = firstHitRow - 1;
+        bottomRight = secondHitRow + 1;
+    }
+
+    if (rowOffset === 0) {
+        newArray[0] = playerBoard[firstHitRow][topLeft] === HIT || playerBoard[firstHitRow][topLeft] === MISS;
+        newArray[1] = playerBoard[firstHitRow][bottomRight] === HIT || playerBoard[firstHitRow][bottomRight] === MISS;
+    } else if (colOffset === 0) {
+        newArray[0] = playerBoard[topLeft][firstHitCol] === HIT || playerBoard[topLeft][firstHitCol] === MISS;
+        newArray[1] = playerBoard[bottomRight][firstHitCol] === HIT || playerBoard[bottomRight][firstHitCol] === MISS;
+    }
+
+    return newArray;
+}
+
+function checkCellForShip(row, col) {
+    const cell = playerBoard[row][col];
+    if ((typeof cell === 'string'
+        || cell instanceof String)
+        && cell !== MISS
+        && cell !== HIT
+    ) {
+        return HIT;
+    } else {
+        return MISS;
+    }
 }
 
 function isValidPosition(row, col) {
@@ -792,4 +903,14 @@ function toCamelCase(input) {
     }
 
     return words.join('');
+}
+
+function handleScoreChange(computerScore) {
+    if (computerScore > computerPreviousScore) {
+        computerScoreChanged = true;
+        computerPreviousScore = computerScore;
+        computerTurnLog.splice(0);
+    } else {
+        computerScoreChanged = false;
+    }
 }
